@@ -7,7 +7,7 @@
   <style>
     html, body { margin: 0; height: 100%; background: #0c0d10; color: #f4f1ea; }
     body {
-      font: 22px/1.35 ui-sans-serif, system-ui, sans-serif;
+      font: 22px/1.35 "Liberation Sans", FreeSans, sans-serif;
       overflow: hidden;
     }
     .stage {
@@ -54,7 +54,7 @@
     dt { color: #b7b1a4; font-size: 15px; }
     dd { margin: 0 0 12px; font-size: 24px; }
     .term {
-      font: 20px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+      font: 20px/1.45 "Liberation Mono", FreeMono, monospace;
       white-space: pre-wrap;
       min-height: 620px;
     }
@@ -213,16 +213,24 @@ Bounded PER_CALL / USD. Advertised fee $0.0009. No spend yet.</div>
       { id: 'sc6', from: 43, to: 52, step: 3, cap: 'discover → inspect → run before an agent spends on the downstream tool.<br>Not monitoring, remediation, contracts, or human review.' },
       { id: 'sc7', from: 52, to: 56, step: 3, cap: 'twzrd-sol.github.io/tool-audit<br>3 live Monid calls · <em>$0.2385</em> · <em>$0.2394</em> · #monid' }
     ];
-    const start = performance.now();
-    function tick(now) {
-      const t = Math.min(55.99, (now - start) / 1000);
+    const params = new URLSearchParams(location.search);
+    const frozen = params.has('t') ? Number(params.get('t')) : null;
+    function showAt(t) {
       const scene = scenes.find(s => t >= s.from && t < s.to) || scenes[scenes.length - 1];
       for (const s of scenes) document.getElementById(s.id).classList.toggle('show', s.id === scene.id);
       document.getElementById('cap').innerHTML = scene.cap;
       for (let i = 0; i < 4; i++) document.getElementById('s' + i).classList.toggle('on', i === scene.step);
+    }
+    if (Number.isFinite(frozen)) {
+      showAt(Math.max(0, Math.min(55.99, frozen)));
+    } else {
+      const start = performance.now();
+      function tick(now) {
+        showAt(Math.min(55.99, (now - start) / 1000));
+        requestAnimationFrame(tick);
+      }
       requestAnimationFrame(tick);
     }
-    requestAnimationFrame(tick);
   </script>
 </body>
 </html>
