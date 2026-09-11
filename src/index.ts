@@ -1,21 +1,74 @@
-import { ToolAuditor, DEFAULT_AUDIT_POLICY } from './auditor.js';
-import { MonidClient, SAMPLE_MONID_CATALOG } from './monid.js';
-import type { MonidEndpoint, AuditPolicy, AuditVerdict } from './types.js';
+import { ToolAuditor } from './auditor.js';
+import { MonidClient } from './monid.js';
+import type { MonidEndpoint, AuditPolicy, AuditVerdict, MonidRun } from './types.js';
 
 export * from './types.js';
 export * from './auditor.js';
 export * from './monid.js';
+export * from './vendor-prescreen.js';
 
 export interface AuditAndExecuteResult {
   step: 'DISCOVER' | 'INSPECT' | 'AUDIT' | 'EXECUTE' | 'REFUSED';
   tool?: MonidEndpoint;
   verdict?: AuditVerdict;
-  execution?: {
-    status: string;
-    result?: unknown;
-    chargedUsd?: number;
-  };
+  execution?: MonidRun;
   refusalReason?: string;
+}
+
+function refusalReason(error: unknown): string {
+  return error instanceof Error ? error.message : 'Unknown pre-spend failure.';
+}
+
+/**
+ * Free consume path: discover a Monid endpoint, inspect its exact schema and
+ * pricing, then evaluate the local policy. This function never runs or pays
+ * for an endpoint.
+ */
+export async function discoverInspectAndAudit(
+  taskQuery: string,
+  policy?: Partial<AuditPolicy>,
+  monidApiKey?: string
+): Promise<AuditAndExecuteResult> {
+  const client = new MonidClient(monidApiKey);
+  const auditor = new ToolAuditor(policy);
+
+  try {
+    const candidates = await client.discover(taskQuery);
+    if (candidates.length === 0) {
+      return {
+        step: 'REFUSED',
+        refusalReason: `No candidate endpoints discovered for query '${taskQuery}'.`
+      };
+    }
+
+    const tool = await client.inspect(candidates[0].id);
+    if (!tool) {
+      return {
+        step: 'REFUSED',
+        refusalReason: `Failed to inspect tool metadata for '${candidates[0].id}'.`
+      };
+    }
+
+    const verdict = auditor.audit(tool);
+    if (verdict.status === 'BLOCKED') {
+      return {
+        step: 'REFUSED',
+        tool,
+        verdict,
+        refusalReason: `Pre-spend audit failed with score ${verdict.score}/100. Spending was not attempted.`
+      };
+    }
+
+    return { step: 'AUDIT', tool, verdict };
+  } catch (error) {
+    return { step: 'REFUSED', refusalReason: refusalReason(error) };
+  }
+}
+
+export interface ExecuteWithAuditOptions {
+  confirmSpend: true;
+  policy?: Partial<AuditPolicy>;
+  monidApiKey?: string;
 }
 
 /**
@@ -29,50 +82,47 @@ export interface AuditAndExecuteResult {
 export async function executeWithAudit(
   taskQuery: string,
   executionParams: Record<string, unknown>,
-  policy?: Partial<AuditPolicy>,
-  monidApiKey?: string
+  options: ExecuteWithAuditOptions
 ): Promise<AuditAndExecuteResult> {
-  const client = new MonidClient(monidApiKey);
-  const auditor = new ToolAuditor(policy);
-
-  // Step 1: Discover
-  const candidates = await client.discover(taskQuery);
-  if (!candidates || candidates.length === 0) {
+  if (options?.confirmSpend !== true) {
     return {
       step: 'REFUSED',
-      refusalReason: `No candidate endpoints discovered for query '${taskQuery}'`
+      refusalReason: 'Paid execution requires confirmSpend: true.'
     };
   }
 
-  // Step 2: Inspect top candidate
-  const candidateId = candidates[0].id;
-  const tool = await client.inspect(candidateId);
-  if (!tool) {
+  const audited = await discoverInspectAndAudit(
+    taskQuery,
+    options.policy,
+    options.monidApiKey
+  );
+  if (audited.step === 'REFUSED' || !audited.tool || !audited.verdict) return audited;
+
+  try {
+    const client = new MonidClient(options.monidApiKey);
+    const execution = await client.run(audited.tool.id, executionParams);
+    const providerStatus = execution.providerResponse?.httpStatus ?? 200;
+    if (execution.status !== 'COMPLETED' || providerStatus >= 400) {
+      return {
+        step: 'REFUSED',
+        tool: audited.tool,
+        verdict: audited.verdict,
+        execution,
+        refusalReason: `Monid run ${execution.runId} ended with ${execution.status} / HTTP ${providerStatus}.`
+      };
+    }
+    return {
+      step: 'EXECUTE',
+      tool: audited.tool,
+      verdict: audited.verdict,
+      execution
+    };
+  } catch (error) {
     return {
       step: 'REFUSED',
-      refusalReason: `Failed to inspect tool metadata for '${candidateId}'`
+      tool: audited.tool,
+      verdict: audited.verdict,
+      refusalReason: refusalReason(error)
     };
   }
-
-  // Step 3: Run Pre-Spend Audit
-  const verdict = auditor.audit(tool);
-
-  // Step 4: Enforce fail-closed gate
-  if (verdict.status === 'BLOCKED') {
-    return {
-      step: 'REFUSED',
-      tool,
-      verdict,
-      refusalReason: `Pre-spend audit FAILED with score ${verdict.score}/100. Critical security or economic bounds breached. Spending aborted.`
-    };
-  }
-
-  // Step 5: Execute safely
-  const execution = await client.run(tool.id, executionParams);
-  return {
-    step: 'EXECUTE',
-    tool,
-    verdict,
-    execution
-  };
 }

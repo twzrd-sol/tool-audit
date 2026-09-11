@@ -71,6 +71,22 @@ export class ToolAuditor {
 
     // Check 3: Economic Safety & Unbounded Multiplication
     let estimatedCost = tool.pricing.baseFeeUsd;
+    if (
+      tool.pricing.model === 'unsupported' ||
+      !Number.isFinite(tool.pricing.baseFeeUsd) ||
+      tool.pricing.baseFeeUsd < 0
+    ) {
+      findings.push({
+        code: 'UNSUPPORTED_PRICING_MODEL',
+        severity: 'CRITICAL',
+        category: 'ECONOMIC_SAFETY',
+        title: `Unsupported Pricing Model '${tool.pricing.rawType}'`,
+        description: 'The endpoint price cannot be reduced to a bounded per-call or per-result amount.',
+        recommendation: 'Refuse execution until the pricing model has an explicit local budget policy.'
+      });
+      penaltyScore += 50;
+    }
+
     if (tool.pricing.model === 'per-result') {
       const hasLimitProp = Boolean(
         tool.inputSchema?.properties?.limit ||
@@ -167,12 +183,12 @@ export class ToolAuditor {
       maxEstimatedCostUsd: Number(estimatedCost.toFixed(4)),
       findings,
       vendorRiskReplaced: {
-        incumbentProcess: 'Enterprise Vendor Risk Assessment (SOC2 SIG / 180-Question Spreadsheet)',
-        incumbentTurnaround: '14 - 21 business days',
-        incumbentCost: '$15,000 - $35,000 / year (OneTrust, Vanta Vendor Risk, Loopio)',
-        toolAuditTurnaround: '< 20ms',
-        toolAuditCost: '$0.00 (Self-Hosted / Open-Source)',
-        savingsPct: '100% time reduction, >99.9% cost reduction'
+        incumbentProcess: 'Vendorapp Startup first-pass vendor pre-screens',
+        incumbentTurnaround: 'On demand, but subscription gated',
+        incumbentCost: '$149/month for 200 AI pre-screens (public price, verified 2026-09-11)',
+        toolAuditTurnaround: 'Measured provider calls complete in seconds',
+        toolAuditCost: '$0.2385 for the measured three-call Monid pre-screen',
+        comparisonNote: 'At 200 identical checks, raw Monid call cost is $47.70; scopes differ and hosting/engineering are excluded.'
       },
       timestamp,
       auditHash

@@ -1,33 +1,50 @@
-# Hackathon Submission Post Copy (X & LinkedIn)
+# Submission post copy
 
-### Post Copy for X (Twitter):
+## X
+
 ```text
-We just killed enterprise vendor security questionnaires with @MonidHQ.
+We killed the first-pass vendor questionnaire.
 
-Them: OneTrust / Vanta at $25,000/yr + 3 weeks of 180-question spreadsheets before you can call an API.
-Us: $0.00 and 14 milliseconds.
+Vendorapp: $149/mo for 200 AI pre-screens.
+tool-audit: $0.2385 measured.
 
-Autonomous agents don't have 3 weeks to wait for a CISO committee.
+3 live Monid calls check price, headers + cookies before an agent spends—without inventing certainty.
 
-Meet tool-audit: an automated pre-spend contract audit for Monid tools.
-- Blocks plaintext HTTP & leaked query auth
-- Prevents runaway unbounded per-result billing
-- Fails closed with 0 spend before your wallet is touched
-
-Live HTTPS demo: https://rental-registered-graph-nec.trycloudflare.com
-Open-source repo: https://github.com/twzrd-sol/tool-audit
-
-Built for the Monid "We Kill" Hackathon.
-
-#AI #Agents #BuildInPublic #Monid #CyberSecurity
+https://twzrd-sol.github.io/tool-audit/
+#monid
 ```
 
----
+Upload `tool-audit-submission.mp4` natively. Do not replace the video with a
+YouTube link. `#monid` must remain in the post body.
 
-### Registration Form on https://hacks.monid.ai/ :
-- **Project Name:** tool-audit
-- **What did you kill?:** Enterprise Vendor Security Questionnaires (OneTrust / Vanta / Loopio)
-- **Target Price vs Your Price:** $25,000/year (14-21 day turnaround) vs $0.00 (< 20ms turnaround)
-- **Public URL:** https://rental-registered-graph-nec.trycloudflare.com
-- **Repository URL:** https://github.com/twzrd-sol/tool-audit
-- **Video Post URL:** [Paste the X / LinkedIn post URL once posted]
+## LinkedIn
+
+```text
+We killed the first-pass vendor questionnaire.
+
+Vendorapp's public Startup plan is $149/month for 200 AI pre-screens. Our
+narrower tool-audit check cost $0.2385 in a measured live run.
+
+It uses three Monid calls to retrieve the incumbent's current offer, inspect
+security headers, and assess cookie/consent evidence before an agent spends.
+The demo found real header issues and returned review_required—not a fake
+green check—because the cookie scan could not verify JavaScript-set cookies or
+the full HTML.
+
+This replaces first-pass evidence collection only, not monitoring,
+remediation, contracts, or human judgment.
+
+Live demo: https://twzrd-sol.github.io/tool-audit/
+Source: https://github.com/twzrd-sol/tool-audit
+
+#monid
+```
+
+## Registration status
+
+Initial registration is confirmed for team `tool-audit`, member `TWZRD`,
+X handle `@twzrd_xyz`, and the corrected Monid account email. The registered
+target is aligned to Vendorapp's published $149/month offer and the measured
+$0.2385 run.
+
+The final video post URL still needs to be registered after publishing.

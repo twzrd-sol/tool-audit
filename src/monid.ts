@@ -1,174 +1,277 @@
-import type { MonidEndpoint } from './types.js';
+import type { MonidEndpoint, MonidRun, MonidRunStatus } from './types.js';
 
-// Pre-packaged catalog of real Monid endpoints + sample audit targets for demonstration
-export const SAMPLE_MONID_CATALOG: MonidEndpoint[] = [
-  {
-    id: 'tinyfish/web-search',
-    name: 'TinyFish Free Web Search',
-    provider: 'TinyFish',
-    description: 'Fast, real-time web search and page fetch with zero monthly subscription.',
-    url: 'https://api.monid.ai/v1/proxy/tinyfish/search',
-    method: 'POST',
-    pricing: {
-      model: 'per-call',
-      baseFeeUsd: 0.000, // free
-    },
-    inputSchema: {
-      type: 'object',
-      properties: {
-        query: { type: 'string', description: 'The search query' },
-        limit: { type: 'number', description: 'Max search results to return', default: 5 }
-      },
-      required: ['query']
-    }
-  },
-  {
-    id: 'apify/tiktok-scraper',
-    name: 'Apify TikTok Scraper',
-    provider: 'Apify',
-    description: 'Extract public video, sound, and profile data from TikTok without residential proxy fees.',
-    url: 'https://api.monid.ai/v1/proxy/apify/tiktok',
-    method: 'POST',
-    pricing: {
-      model: 'per-call',
-      baseFeeUsd: 0.0057
-    },
-    inputSchema: {
-      type: 'object',
-      properties: {
-        profiles: { type: 'string', description: 'Target TikTok profile handle' },
-        resultsLimit: { type: 'number', description: 'Maximum posts to scrape', default: 10 }
-      },
-      required: ['profiles']
-    }
-  },
-  {
-    id: 'apollo/lead-enrichment',
-    name: 'Apollo Lead Enrichment',
-    provider: 'Apollo',
-    description: 'Enrich B2B executive emails, titles, and verified company domains.',
-    url: 'https://api.monid.ai/v1/proxy/apollo/enrich',
-    method: 'POST',
-    pricing: {
-      model: 'per-call',
-      baseFeeUsd: 0.015
-    },
-    inputSchema: {
-      type: 'object',
-      properties: {
-        domain: { type: 'string', description: 'Company domain name' },
-        title_filter: { type: 'string', description: 'Job title filter' }
-      },
-      required: ['domain']
-    }
-  },
-  // Sample Risky / Misconfigured Endpoint (to demonstrate BLOCK verdict in demo & video)
-  {
-    id: 'unvetted/unbounded-data-leak',
-    name: 'Unvetted Shadow Analytics',
-    provider: 'Unknown Third-Party',
-    description: 'Third-party tool with insecure query auth and unbounded per-result multiplication.',
-    url: 'http://legacy-collector.unvetted-api.net/collect?api_key=SECRET_TOKEN_HERE',
-    method: 'GET',
-    pricing: {
-      model: 'per-result',
-      baseFeeUsd: 0.15,
-      unitFeeUsd: 0.05
-    },
-    inputSchema: {
-      type: 'object',
-      properties: {
-        api_key: { type: 'string', description: 'Raw secret key' },
-        filter: { type: 'string', description: 'Wildcard filter' }
-      }
-    }
+type FetchLike = typeof fetch;
+
+interface JsonSchema {
+  type?: string;
+  properties?: MonidEndpoint['inputSchema']['properties'];
+  required?: string[];
+}
+
+interface RawEndpoint {
+  provider?: string;
+  providerName?: string;
+  endpoint?: string;
+  description?: string;
+  summary?: string;
+  method?: string;
+  input?: {
+    pathParams?: JsonSchema;
+    queryParams?: JsonSchema;
+    body?: JsonSchema;
+  };
+  price?: {
+    type?: string;
+    amount?: { value?: number; currency?: string };
+    flatFee?: { value?: number; currency?: string };
+    notes?: string[];
+  };
+}
+
+const TERMINAL_STATUSES = new Set<MonidRunStatus>([
+  'COMPLETED',
+  'FAILED',
+  'BLOCKED',
+  'STOPPED',
+  'TIMED_OUT'
+]);
+
+export class MonidConfigurationError extends Error {
+  constructor() {
+    super('Monid credentials are required. Set MONID_API_KEY (or MONID_API) before discovery, inspection, or execution.');
+    this.name = 'MonidConfigurationError';
   }
-];
+}
+
+export class MonidApiError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string
+  ) {
+    super(message);
+    this.name = 'MonidApiError';
+  }
+}
+
+export class MonidPendingRunError extends Error {
+  constructor(public readonly runId: string) {
+    super(`Monid run ${runId} is still pending; reconcile it with GET /v1/runs/${runId}.`);
+    this.name = 'MonidPendingRunError';
+  }
+}
+
+function messageFromPayload(payload: unknown): string {
+  if (payload && typeof payload === 'object') {
+    const record = payload as Record<string, unknown>;
+    if (typeof record.message === 'string') return record.message;
+    if (typeof record.error === 'string') return record.error;
+  }
+  return 'Monid API request failed';
+}
+
+function parseToolId(toolId: string): { provider: string; endpoint: string } {
+  const separator = toolId.indexOf(':');
+  if (separator <= 0 || separator === toolId.length - 1) {
+    throw new Error(`Invalid Monid tool id '${toolId}'. Expected '<provider>:</endpoint>'.`);
+  }
+  return {
+    provider: toolId.slice(0, separator),
+    endpoint: toolId.slice(separator + 1)
+  };
+}
 
 export class MonidClient {
   private apiKey?: string;
   private baseUrl: string;
+  private fetchImpl: FetchLike;
 
-  constructor(apiKey?: string, baseUrl = 'https://api.monid.ai/v1') {
-    this.apiKey = apiKey || process.env.MONID_API_KEY;
-    this.baseUrl = baseUrl;
+  constructor(
+    apiKey?: string,
+    baseUrl = 'https://api.monid.ai/v1',
+    fetchImpl: FetchLike = globalThis.fetch
+  ) {
+    this.apiKey = apiKey === undefined
+      ? process.env.MONID_API_KEY || process.env.MONID_API
+      : apiKey;
+    this.baseUrl = baseUrl.replace(/\/+$/, '');
+    this.fetchImpl = fetchImpl;
   }
 
-  public async discover(query: string): Promise<MonidEndpoint[]> {
-    if (this.apiKey) {
-      try {
-        const res = await fetch(`${this.baseUrl}/discover`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ query, limit: 10 })
-        });
-        if (res.ok) {
-          const data = await res.json() as { endpoints?: MonidEndpoint[] };
-          if (Array.isArray(data.endpoints) && data.endpoints.length > 0) {
-            return data.endpoints;
-          }
-        }
-      } catch (err) {
-        console.warn('Monid live discover fetch failed, falling back to local catalog:', err);
-      }
+  private requireApiKey(): string {
+    if (!this.apiKey) throw new MonidConfigurationError();
+    return this.apiKey;
+  }
+
+  private async readJson(response: Response): Promise<unknown> {
+    const text = await response.text();
+    if (!text) return {};
+    try {
+      return JSON.parse(text);
+    } catch {
+      throw new MonidApiError(response.status, 'Monid returned a non-JSON response.');
+    }
+  }
+
+  private async post(path: string, body: unknown): Promise<unknown> {
+    const response = await this.fetchImpl(`${this.baseUrl}${path}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.requireApiKey()}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    const payload = await this.readJson(response);
+    if (!response.ok) {
+      throw new MonidApiError(response.status, messageFromPayload(payload));
+    }
+    return payload;
+  }
+
+  private normalizeEndpoint(raw: RawEndpoint): MonidEndpoint {
+    const provider = String(raw.provider || 'unknown');
+    const endpoint = String(raw.endpoint || '');
+    if (provider === 'unknown' || !endpoint.startsWith('/')) {
+      throw new MonidApiError(502, 'Monid endpoint response omitted a valid provider or endpoint path.');
+    }
+    const price = raw.price || {};
+    const amount = price.amount || {};
+    const input = raw.input || {};
+    const schemas = [input.pathParams, input.queryParams, input.body].filter(
+      (schema): schema is JsonSchema => Boolean(schema)
+    );
+    const inputSchema: MonidEndpoint['inputSchema'] = {
+      type: 'object',
+      properties: Object.assign({}, ...schemas.map(schema => schema.properties || {})),
+      required: [...new Set(schemas.flatMap(schema => schema.required || []))]
+    };
+    const rawType = String(price.type || 'UNKNOWN').toUpperCase();
+    const method = String(raw.method || 'POST').toUpperCase();
+    const supportedMethod = ['GET', 'POST', 'PUT', 'DELETE'].includes(method)
+      ? method as MonidEndpoint['method']
+      : 'POST';
+
+    let model: MonidEndpoint['pricing']['model'] = 'unsupported';
+    let baseFeeUsd = -1;
+    let unitFeeUsd: number | undefined;
+    if (rawType === 'PER_CALL') {
+      model = 'per-call';
+      baseFeeUsd = Number(amount.value ?? -1);
+    } else if (rawType === 'PER_RESULT') {
+      model = 'per-result';
+      baseFeeUsd = Number(price.flatFee?.value ?? 0);
+      unitFeeUsd = Number(amount.value ?? -1);
     }
 
-    // Fallback search across sample catalog
-    const qLower = query.toLowerCase();
-    return SAMPLE_MONID_CATALOG.filter(tool =>
-      tool.name.toLowerCase().includes(qLower) ||
-      tool.description.toLowerCase().includes(qLower) ||
-      tool.provider.toLowerCase().includes(qLower) ||
-      tool.id.toLowerCase().includes(qLower)
-    );
+    return {
+      id: `${provider}:${endpoint}`,
+      name: raw.providerName || provider,
+      provider,
+      description: raw.description || raw.summary || '',
+      url: `${this.baseUrl}/run`,
+      method: supportedMethod,
+      inputSchema,
+      pricing: {
+        model,
+        rawType,
+        baseFeeUsd,
+        ...(unitFeeUsd === undefined ? {} : { unitFeeUsd }),
+        ...(price.notes ? { notes: price.notes } : {})
+      }
+    };
+  }
+
+  public async discover(query: string, limit = 10): Promise<MonidEndpoint[]> {
+    const trimmed = query.trim();
+    if (!trimmed) throw new Error('Discovery query cannot be empty.');
+    if (!Number.isInteger(limit) || limit < 1 || limit > 40) {
+      throw new Error('Discovery limit must be an integer from 1 to 40.');
+    }
+    const payload = await this.post('/discover', { query: trimmed, limit }) as {
+      results?: RawEndpoint[];
+    };
+    if (!Array.isArray(payload.results)) {
+      throw new MonidApiError(502, 'Monid discover response did not contain a results array.');
+    }
+    return payload.results.map(item => this.normalizeEndpoint(item));
   }
 
   public async inspect(toolId: string): Promise<MonidEndpoint | null> {
-    if (this.apiKey) {
-      try {
-        const res = await fetch(`${this.baseUrl}/inspect?id=${encodeURIComponent(toolId)}`, {
-          headers: {
-            'Authorization': `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        if (res.ok) {
-          return await res.json() as MonidEndpoint;
-        }
-      } catch (err) {
-        console.warn('Monid live inspect fetch failed, falling back to local catalog:', err);
-      }
-    }
-
-    return SAMPLE_MONID_CATALOG.find(t => t.id === toolId) || null;
+    const { provider, endpoint } = parseToolId(toolId);
+    const payload = await this.post('/inspect', { provider, endpoint }) as RawEndpoint;
+    return this.normalizeEndpoint(payload);
   }
 
-  public async run(toolId: string, params: Record<string, unknown>): Promise<{ status: string; result?: unknown; chargedUsd?: number }> {
-    if (this.apiKey) {
-      const res = await fetch(`${this.baseUrl}/run`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ id: toolId, input: params })
-      });
-      return await res.json() as { status: string; result?: unknown; chargedUsd?: number };
+  public async getRun(runId: string): Promise<MonidRun> {
+    const response = await this.fetchImpl(`${this.baseUrl}/runs/${encodeURIComponent(runId)}`, {
+      headers: { 'Authorization': `Bearer ${this.requireApiKey()}` }
+    });
+    const payload = await this.readJson(response);
+    if (!response.ok) {
+      throw new MonidApiError(response.status, messageFromPayload(payload));
+    }
+    return this.normalizeRun(payload);
+  }
+
+  private normalizeRun(payload: unknown): MonidRun {
+    if (!payload || typeof payload !== 'object') {
+      throw new MonidApiError(502, 'Monid run response was not an object.');
+    }
+    const run = payload as Partial<MonidRun>;
+    if (!run.runId || !run.provider || !run.endpoint || !run.status) {
+      throw new MonidApiError(502, 'Monid run response omitted required identity fields.');
+    }
+    if (
+      !TERMINAL_STATUSES.has(run.status) &&
+      !['READY', 'RUNNING', 'STOPPING'].includes(run.status)
+    ) {
+      throw new MonidApiError(502, `Monid returned unknown run status '${run.status}'.`);
+    }
+    return run as MonidRun;
+  }
+
+  public async run(
+    toolId: string,
+    input: Record<string, unknown>,
+    options: { wait?: boolean; timeoutMs?: number; pollMs?: number } = {}
+  ): Promise<MonidRun> {
+    const { provider, endpoint } = parseToolId(toolId);
+    const response = await this.fetchImpl(`${this.baseUrl}/run`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.requireApiKey()}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ provider, endpoint, input })
+    });
+    const payload = await this.readJson(response);
+    const hasRunIdentity = Boolean(
+      payload &&
+      typeof payload === 'object' &&
+      (payload as Record<string, unknown>).runId
+    );
+    if (!response.ok && !hasRunIdentity) {
+      throw new MonidApiError(response.status, messageFromPayload(payload));
     }
 
-    // Simulated execution receipt for demo/offline
-    const tool = await this.inspect(toolId);
-    return {
-      status: 'success',
-      chargedUsd: tool?.pricing.baseFeeUsd ?? 0.005,
-      result: {
-        message: `Executed ${toolId} successfully via Monid pay-per-call gateway.`,
-        simulated: true,
-        data: { queryParams: params }
-      }
-    };
+    const run = this.normalizeRun(payload);
+    if (options.wait === false || TERMINAL_STATUSES.has(run.status)) return run;
+
+    const timeoutMs = options.timeoutMs ?? 120_000;
+    const pollMs = options.pollMs ?? 1_000;
+    if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+      throw new Error('Monid run timeoutMs must be positive.');
+    }
+    if (!Number.isFinite(pollMs) || pollMs <= 0) {
+      throw new Error('Monid run pollMs must be positive.');
+    }
+    const deadline = Date.now() + timeoutMs;
+    let latest = run;
+    while (!TERMINAL_STATUSES.has(latest.status)) {
+      if (Date.now() >= deadline) throw new MonidPendingRunError(run.runId);
+      await new Promise(resolve => setTimeout(resolve, pollMs));
+      latest = await this.getRun(run.runId);
+    }
+    return latest;
   }
 }

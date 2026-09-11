@@ -14,6 +14,7 @@ test('ToolAuditor: approves secure, bounded endpoints', () => {
     method: 'POST',
     pricing: {
       model: 'per-call',
+      rawType: 'PER_CALL',
       baseFeeUsd: 0.005
     },
     inputSchema: {
@@ -43,6 +44,7 @@ test('ToolAuditor: blocks insecure plaintext HTTP endpoints', () => {
     method: 'POST',
     pricing: {
       model: 'per-call',
+      rawType: 'PER_CALL',
       baseFeeUsd: 0.005
     },
     inputSchema: {
@@ -68,6 +70,7 @@ test('ToolAuditor: flags credentials in URL query parameters', () => {
     method: 'GET',
     pricing: {
       model: 'per-call',
+      rawType: 'PER_CALL',
       baseFeeUsd: 0.005
     },
     inputSchema: {
@@ -92,6 +95,7 @@ test('ToolAuditor: blocks spend ceiling breaches', () => {
     method: 'POST',
     pricing: {
       model: 'per-call',
+      rawType: 'PER_CALL',
       baseFeeUsd: 2.00
     },
     inputSchema: {
@@ -116,6 +120,7 @@ test('ToolAuditor: flags unbounded per-result billing multipliers', () => {
     method: 'POST',
     pricing: {
       model: 'per-result',
+      rawType: 'PER_RESULT',
       baseFeeUsd: 0.01,
       unitFeeUsd: 0.02
     },

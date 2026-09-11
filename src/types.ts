@@ -1,7 +1,9 @@
 export interface MonidPricing {
-  model: 'per-call' | 'per-result';
+  model: 'per-call' | 'per-result' | 'unsupported';
+  rawType: string;
   baseFeeUsd: number;
   unitFeeUsd?: number;
+  notes?: string[];
 }
 
 export interface MonidEndpoint {
@@ -25,6 +27,44 @@ export interface MonidEndpoint {
   pricing: MonidPricing;
   authType?: 'bearer' | 'api-key' | 'none';
   headers?: Record<string, string>;
+}
+
+export type MonidRunStatus =
+  | 'READY'
+  | 'RUNNING'
+  | 'STOPPING'
+  | 'COMPLETED'
+  | 'FAILED'
+  | 'BLOCKED'
+  | 'STOPPED'
+  | 'TIMED_OUT';
+
+export interface MonidMoney {
+  value: number;
+  currency: string;
+}
+
+export interface MonidRun {
+  runId: string;
+  provider: string;
+  endpoint: string;
+  status: MonidRunStatus;
+  output?: unknown;
+  reason?: string;
+  controls?: unknown[];
+  providerResponse?: {
+    httpStatus?: number;
+    error?: unknown;
+  };
+  price?: {
+    type?: string;
+    amount?: MonidMoney;
+  };
+  cost?: MonidMoney;
+  billedUnits?: number;
+  createdAt?: string;
+  startedAt?: string;
+  completedAt?: string;
 }
 
 export interface AuditPolicy {
@@ -62,8 +102,43 @@ export interface AuditVerdict {
     incumbentCost: string;
     toolAuditTurnaround: string;
     toolAuditCost: string;
-    savingsPct: string;
+    comparisonNote: string;
   };
   timestamp: string;
   auditHash: string;
+}
+
+export interface PrescreenRunReceipt {
+  purpose: 'incumbent_price' | 'security_headers' | 'cookie_consent';
+  runId: string;
+  provider: string;
+  endpoint: string;
+  status: MonidRunStatus;
+  costUsd: number;
+  providerHttpStatus?: number;
+}
+
+export interface VendorPrescreenReport {
+  schema: 'tool-audit.vendor-prescreen.v1';
+  targetUrl: string;
+  incumbent: {
+    name: 'Vendorapp Startup';
+    pricingUrl: string;
+    monthlyPriceUsd: 149;
+    includedPrescreens: 200;
+    freeTierPrescreens: 15;
+    verifiedFromLivePage: boolean;
+  };
+  verdict: 'review_required' | 'unable_to_verify';
+  findings: {
+    missingSecurityHeaders: unknown[];
+    cookiePotentialIssues: string[];
+  };
+  receipts: PrescreenRunReceipt[];
+  measuredCostUsd: number;
+  scope: {
+    replaces: string;
+    doesNotReplace: string[];
+  };
+  generatedAt: string;
 }

@@ -1,121 +1,128 @@
-# tool-audit 🛡️
-> **Kill vendor security questionnaires with a 14ms pre-spend contract audit.**  
-> Built for the **Monid “We Kill” Hackathon** (Sep 10, 2026).
+# tool-audit
 
----
+First-pass vendor evidence before an agent spends.
 
-## The Target We Killed
+Built for Monid's 2026 "We Kill" Hackathon.
 
-Enterprise software forces companies to spend **$15,000 – $35,000 / year** on vendor security questionnaire software (OneTrust, Vanta Vendor Risk, Loopio, Whistic). Every time a developer or team wants to use a new third-party API or data provider, security sends a 180-question spreadsheet:
-- *Do you encrypt in transit?*
-- *Do you log tokens in URL query strings?*
-- *Can this API result in runaway billing?*
-- *What data egress boundaries are enforced?*
+- Live demo: https://twzrd-sol.github.io/tool-audit/
+- Measured receipts: https://twzrd-sol.github.io/tool-audit/receipt.html
+- Reproducible snapshot: [`evidence/measured-demo.json`](evidence/measured-demo.json)
 
-**Review turnaround:** 14 to 21 business days.  
-**Human cost:** Thousands of dollars in compliance reviews.  
-**Agent reality:** Autonomous agents use tools on demand. An AI agent using Monid to scrape a web page or enrich a lead **cannot wait 3 weeks for an infosec committee to clear a spreadsheet.**
+## What it replaces
 
----
+Vendorapp's public Startup plan is **$149/month for 200 AI pre-screens**.
+Its Basic plan includes **15 pre-screens free**.
 
-## The Solution: Instant Pre-Spend Contract Audit
+`tool-audit` replaces one narrower workflow: collect live, before-spend vendor
+evidence without buying a seat first. It does not replace continuous
+monitoring, remediation, contracts, vendor lifecycle management, or human
+judgment.
 
-`tool-audit` replaces human questionnaire bureaucracy with an automated, machine-verifiable contract check that runs in **14 milliseconds for $0.00** before an agent ever spends money on Monid.
+The measured demo used three live Monid calls:
 
-| Metric | The Old SaaS Way (OneTrust / Loopio) | The Monid Way (`tool-audit`) |
-|---|---|---|
-| **Annual Cost** | **$15,000 – $35,000 / year** | **$0.00** (Open Source / Zero Subscription) |
-| **Turnaround** | **14 – 21 Business Days** | **14 Milliseconds** |
-| **Review Method** | 180-question human spreadsheet | Automated AST & Schema contract evaluation |
-| **Autonomous Agent Ready?** | ❌ No (Requires security team) | ✅ Yes (Instant JSON decision) |
-| **Economic Protection** | ❌ Post-facto billing surprises | ✅ Enforces max price per call & bounded arrays |
+| Purpose | Provider and endpoint | Cost |
+| --- | --- | ---: |
+| Retrieve the incumbent's current public offer | `context.dev:/web/scrape/markdown` | $0.0009 |
+| Inspect target security headers | `api.strale.io:/x402/header-security-check` | $0.0594 |
+| Inspect target cookie/consent evidence | `api.strale.io:/x402/v2/cookie-scan` | $0.1782 |
+| **Measured total** | | **$0.2385** |
 
----
+At 200 identical checks, raw Monid call cost would be $47.70 versus the
+$149 subscription. That comparison excludes hosting and engineering, and the
+product scopes are not identical.
 
-## How It Works: The Consume Path
+## Safety boundary
 
-In Monid, agents use the standard flow: `discover` → `inspect` → `run`.  
-`tool-audit` hooks directly between `inspect` and `run`:
+The paid path is deliberately hard to trigger:
 
-```text
-1. Agent discovers tool
-      ↓ monid.discover(query)
-2. Agent inspects schema & pricing
-      ↓ monid.inspect(tool_id)
-3. tool-audit runs pre-spend evaluation
-      ↓ toolAudit.audit(endpoint_spec)
-      ├── Transport Security: Enforces TLS 1.3 / HTTPS (blocks plaintext HTTP)
-      ├── Credential Hygiene: Detects API keys / tokens leaked in URL query params
-      ├── Economic Bounds: Blocks unbounded 'per-result' charges lacking limit caps
-      ├── Price Ceilings: Enforces hard organizational budget ceilings (e.g. $0.10/call)
-      └── Data Egress: Blocks transmission of raw credentials or unregulated PII
-      ↓
-4. Decision Gate
-      ├── 🛑 BLOCKED (Score < 50): Aborts instantly with 0 spend & signed refusal
-      └── 🚀 APPROVED: Calls monid.run() and debits balance
-```
+1. A Monid key must be supplied through `MONID_API_KEY` (or `MONID_API`).
+   Missing credentials fail closed; there is no fixture or simulated fallback.
+2. Every required endpoint must appear in live `discover` results.
+3. `inspect` must return a supported, bounded price and schema.
+4. The local policy audits all three contracts before the first paid call.
+5. Their advertised total must fit `--max-total`.
+6. The CLI requires the literal `--confirm-spend` flag.
+7. Every run must end `COMPLETED` with a 2xx provider response and a cost
+   receipt.
 
----
+Unknown evidence is never converted into approval. The measured cookie result
+is explicitly limited: only partial HTML was analyzed and JavaScript-set
+cookies were not observed. The combined demo verdict is therefore
+`review_required`, not a green check.
 
-## 5 Core Pre-Spend Verification Checks
+## Install
 
-1. **`INSECURE_TRANSPORT` [CRITICAL]:** Refuses endpoints communicating over plaintext HTTP (`http://`).
-2. **`QUERY_AUTH_LEAKAGE` [HIGH]:** Detects sensitive parameters (`api_key`, `token`, `secret`, `bearer`) passed in GET query strings, which leak into access logs and proxies.
-3. **`UNBOUNDED_RESULT_BILLING` [HIGH]:** Identifies `per-result` pricing models that lack a `limit` or `max_results` parameter in the schema, preventing runaway wallet drains.
-4. **`PRICE_CEILING_BREACH` [CRITICAL]:** Enforces local spend policies before execution. If a tool charges more than the pre-approved maximum, execution is halted.
-5. **`HIGH_RISK_EGRESS_PARAM` [CRITICAL]:** Flags schemas requesting sensitive credentials or root private keys.
-
----
-
-## Quickstart
-
-### 1. Run the CLI
 ```bash
-# Show side-by-side comparison against human vendor review
-npx tsx src/cli.ts compare
-
-# Audit a real Monid tool
-npx tsx src/cli.ts audit apify/tiktok-scraper
-
-# Audit a misconfigured / high-risk tool (shows BLOCK verdict)
-npx tsx src/cli.ts audit unvetted/unbounded-data-leak
-
-# Run the complete agent consume loop (Discover -> Inspect -> Audit -> Run)
-npx tsx src/cli.ts consume tiktok
+npm ci
+npm run build
+npm test
 ```
 
-### 2. Run the HTTP Service & Web UI
+Store the Monid credential outside the repository:
+
 ```bash
-npm run dev
-# Opens on http://localhost:8787
+export MONID_API_KEY='monid_live_...'
 ```
 
-- `GET /` — Interactive web dashboard & comparison matrix
-- `GET /v1/demo` — Machine-readable comparison payload
-- `POST /v1/audit` — JSON API for agent frameworks & MCP servers
+`.env` files are ignored. Never commit the key.
 
-### 3. Agent Integration
+## Free pre-spend path
+
+Discovery, inspection, and local policy evaluation do not execute the selected
+tool:
+
+```bash
+node dist/cli.js discover-audit "vendor security compliance"
+```
+
+Inspect and audit an exact endpoint:
+
+```bash
+node dist/cli.js audit api.strale.io:/x402/header-security-check
+```
+
+## Paid vendor pre-screen
+
+This command makes three paid calls. It first checks the complete advertised
+cost against a $0.24 ceiling:
+
+```bash
+node dist/cli.js prescreen https://monid.ai \
+  --max-total 0.24 \
+  --confirm-spend
+```
+
+Catalog prices can change. If their sum rises above the ceiling, the command
+refuses before spending.
+
+## Library use
+
 ```typescript
-import { executeWithAudit } from 'tool-audit';
+import { discoverInspectAndAudit, runVendorPrescreen } from 'tool-audit';
 
-const result = await executeWithAudit('tiktok scraping', {
-  profile: 'elonmusk'
-}, {
-  maxPricePerCallUsd: 0.05
+// Free: discover -> inspect -> local audit.
+const preflight = await discoverInspectAndAudit('vendor security compliance');
+
+// Paid: explicit confirmation and aggregate ceiling required.
+const report = await runVendorPrescreen('https://example.com', {
+  confirmSpend: true,
+  maxTotalUsd: 0.24
 });
-
-if (result.step === 'REFUSED') {
-  console.log('Blocked before spending:', result.refusalReason);
-} else {
-  console.log('Executed safely via Monid! Cost:', result.execution.chargedUsd);
-}
 ```
 
----
+## Local HTTP surface
 
-## Monid Hackathon Submission Details
+```bash
+npm start
+```
 
-- **Target:** Enterprise Vendor Security Questionnaires (OneTrust, Vanta Vendor Risk, Loopio)
-- **Monid Integration:** Live `discover` → `inspect` → `audit` → `run` consume path
-- **Pricing Comparison:** $25,000/yr human review vs. $0.00 / 14ms automated agent audit
-- **License:** MIT
+- `GET /health`
+- `GET /v1/demo` — the measured, non-secret receipt snapshot
+- `POST /v1/audit` — local audit of a supplied Monid endpoint contract
+
+There is intentionally no unauthenticated HTTP route that spends the server's
+Monid balance.
+
+## License
+
+MIT
