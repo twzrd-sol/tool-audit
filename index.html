@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="tool-audit: a Monid-powered pre-spend vendor check built for the We Kill Hackathon.">
+  <title>tool-audit — kill the first-pass vendor questionnaire</title>
+  <style>
+    :root{--bg:#090a0f;--panel:#11131b;--line:#262a3a;--text:#f8fafc;--muted:#a9b1c3;--blue:#4f66ff;--cyan:#56d7ff;--green:#32d583;--amber:#fbbf24;--red:#fb7185}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 75% -10%,#2230a944,transparent 35%),var(--bg);color:var(--text);font:16px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    a{color:inherit}.wrap{width:min(1100px,calc(100% - 36px));margin:auto}.nav{display:flex;justify-content:space-between;align-items:center;padding:24px 0}.brand{font:800 19px ui-monospace,SFMono-Regular,Menlo,monospace}.tag{border:1px solid #5062ff66;background:#5062ff16;color:#9da8ff;padding:6px 11px;border-radius:99px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    .hero{padding:72px 0 50px;text-align:center}.eyebrow{color:var(--cyan);font:800 13px ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase;letter-spacing:.14em}.hero h1{font-size:clamp(44px,7vw,82px);line-height:.98;letter-spacing:-.055em;max-width:950px;margin:18px auto}.hero p{color:var(--muted);font-size:clamp(18px,2.4vw,23px);max-width:760px;margin:24px auto}.hero strong{color:white}.actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:30px}.btn{display:inline-flex;padding:12px 17px;border-radius:10px;border:1px solid var(--line);background:#151826;text-decoration:none;font-weight:750}.btn.primary{background:var(--blue);border-color:var(--blue)}
+    .receipt{display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;gap:14px;margin:36px 0 18px}.price{background:linear-gradient(150deg,#151824,#0e1017);border:1px solid var(--line);border-radius:18px;padding:28px}.price h2{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin:0 0 10px}.big{font-size:clamp(40px,5vw,64px);font-weight:900;letter-spacing:-.05em}.sub{color:var(--muted)}.arrow{align-self:center;color:var(--cyan);font-size:32px;font-weight:900}.price.us{border-color:#4f66ff88;box-shadow:0 0 40px #4f66ff1c}.price.us .big{color:#8be3ff}
+    .honesty{margin:12px 0 48px;padding:14px 18px;border-left:3px solid var(--amber);background:#fbbf240b;color:#d8deea}.honesty strong{color:#fde68a}
+    h3.section{font-size:clamp(28px,4vw,42px);letter-spacing:-.035em;margin:68px 0 10px}.lead{color:var(--muted);max-width:750px}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0}.step{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:22px}.num{color:var(--cyan);font:800 12px ui-monospace,SFMono-Regular,Menlo,monospace}.step h4{font-size:18px;margin:10px 0}.cost{font:800 18px ui-monospace,SFMono-Regular,Menlo,monospace;color:#9da8ff}.step p{color:var(--muted);margin-bottom:0}
+    .report{margin:24px 0;background:#0b0d14;border:1px solid var(--line);border-radius:16px;overflow:hidden}.report-head{display:flex;justify-content:space-between;padding:15px 18px;background:#141722;border-bottom:1px solid var(--line);font:700 13px ui-monospace,SFMono-Regular,Menlo,monospace}.live{color:var(--green)}.rows{padding:6px 18px}.row{display:grid;grid-template-columns:170px 1fr;gap:18px;padding:14px 0;border-bottom:1px solid #202330}.row:last-child{border:none}.row b{color:#cbd5e1}.bad{color:var(--red)}.warn{color:var(--amber)}.muted{color:var(--muted)}
+    .scope{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:24px 0 78px}.scope>div{border:1px solid var(--line);background:var(--panel);border-radius:15px;padding:22px}.scope h4{margin:0 0 12px}.scope ul{margin:0;padding-left:20px;color:var(--muted)}footer{border-top:1px solid var(--line);padding:25px 0 45px;color:var(--muted);display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-size:13px}
+    @media(max-width:760px){.receipt{grid-template-columns:1fr}.arrow{transform:rotate(90deg);justify-self:center}.steps,.scope{grid-template-columns:1fr}.row{grid-template-columns:1fr;gap:4px}.hero{padding-top:42px}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <nav class="nav"><span class="brand">tool-audit</span><span class="tag">#monid · live-data prototype</span></nav>
+    <section class="hero">
+      <div class="eyebrow">We killed the first-pass vendor questionnaire</div>
+      <h1>Check the vendor <em>before</em> your agent spends.</h1>
+      <p>Vendorapp sells 200 AI pre-screens for <strong>$149/month</strong>. This narrower, on-demand check used Monid to retrieve live pricing, inspect security headers, and assess cookie evidence for <strong>$0.2385 total</strong>.</p>
+      <div class="actions">
+        <a class="btn primary" href="https://github.com/twzrd-sol/tool-audit">View source</a>
+        <a class="btn" href="https://vendorapp.co/pricing/">Verify incumbent price</a>
+      </div>
+    </section>
+
+    <section class="receipt" aria-label="Measured price comparison">
+      <article class="price">
+        <h2>Vendorapp Startup</h2><div class="big">$149<span style="font-size:.3em">/mo</span></div>
+        <div class="sub">200 AI pre-screens · published public price</div>
+      </article>
+      <div class="arrow">→</div>
+      <article class="price us">
+        <h2>tool-audit measured run</h2><div class="big">$0.2385</div>
+        <div class="sub">3 live Monid calls · pay per check</div>
+      </article>
+    </section>
+    <aside class="honesty"><strong>Honest scope:</strong> Vendorapp also offers 15 pre-screens free. tool-audit replaces only the first-pass, before-spend evidence check—not ongoing vendor management, contracts, remediation, or human judgment. At 200 identical checks, raw Monid call cost would be $47.70 before hosting and engineering.</aside>
+
+    <h3 class="section">Discover → inspect → audit</h3>
+    <p class="lead">The production path fails closed when Monid auth is absent. Each paid result carries measured cost, provenance, and a settlement receipt.</p>
+    <section class="steps">
+      <article class="step"><span class="num">01 · LIVE PRICING</span><h4>Extract the incumbent offer</h4><div class="cost">$0.0009</div><p><code>context.dev /web/scrape/markdown</code> retrieved Vendorapp’s current pricing page and the Startup plan’s 200-pre-screen allowance.</p></article>
+      <article class="step"><span class="num">02 · SECURITY HEADERS</span><h4>Measure the target</h4><div class="cost">$0.0594</div><p><code>Strale /header-security-check</code> returned timestamped header evidence for the sample target, <code>monid.ai</code>.</p></article>
+      <article class="step"><span class="num">03 · COOKIE EVIDENCE</span><h4>Preserve uncertainty</h4><div class="cost">$0.1782</div><p><code>Strale /cookie-scan</code> returned observations plus explicit limits instead of inventing a clean verdict.</p></article>
+    </section>
+
+    <h3 class="section">A usable pre-spend report</h3>
+    <p class="lead">Sample target: <code>https://monid.ai</code>. Retrieved 2026-09-11 UTC through live Monid calls.</p>
+    <section class="report">
+      <div class="report-head"><span>vendor_pre_screen.json</span><span class="live">● LIVE</span></div>
+      <div class="rows">
+        <div class="row"><b>price_receipt</b><span>$0.0009 · public page retrieved · Startup $149/month confirmed</span></div>
+        <div class="row"><b>header_check</b><span class="bad">10/F · six missing security headers reported</span></div>
+        <div class="row"><b>cookie_check</b><span class="warn">unable_to_verify · no banner observed, but JS cookies and full HTML were not verified</span></div>
+        <div class="row"><b>total_cost</b><span>$0.2385 USD · measured, including all three calls</span></div>
+        <div class="row"><b>decision</b><span>review_required · no fake green check</span></div>
+      </div>
+    </section>
+
+    <section class="scope">
+      <div><h4>What died</h4><ul><li>Waiting for a seat before an agent can perform a first-pass check</li><li>Opaque pricing before tool selection</li><li>“No evidence” silently becoming “safe”</li></ul></div>
+      <div><h4>What did not die</h4><ul><li>Continuous monitoring and remediation</li><li>Contract and vendor lifecycle management</li><li>Human review for material or ambiguous risk</li></ul></div>
+    </section>
+  </main>
+  <footer class="wrap"><span>Built for Monid’s “We Kill” Hackathon · 2026</span><span>Live evidence, measured cost, explicit uncertainty.</span></footer>
+</body>
+</html>
