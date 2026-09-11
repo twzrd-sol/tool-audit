@@ -1,113 +1,115 @@
 #!/usr/bin/env node
 import { ToolAuditor } from './auditor.js';
-import { MonidClient, SAMPLE_MONID_CATALOG } from './monid.js';
-import { executeWithAudit } from './index.js';
+import { MonidClient } from './monid.js';
+import { discoverInspectAndAudit, executeWithAudit } from './index.js';
+import { runVendorPrescreen } from './vendor-prescreen.js';
 
 async function main() {
   const args = process.argv.slice(2);
   const command = args[0] || 'compare';
 
-  console.log(`\n🛡️  tool-audit: Kill Vendor Questionnaires with a Pre-Spend Check`);
+  console.log(`\n🛡️  tool-audit: first-pass vendor evidence before an agent spends`);
   console.log(`─────────────────────────────────────────────────────────────`);
 
   if (command === 'compare') {
-    console.log(`\n📊 THE KILL: Enterprise Human Questionnaire vs. Agent Tool-Audit\n`);
+    console.log(`\n📊 MEASURED COMPARISON (2026-09-11 UTC)\n`);
     console.table([
       {
-        Metric: 'Turnaround Time',
-        'Human Vendor Review (OneTrust/Vanta/SIG)': '14 to 21 Business Days',
-        'tool-audit (Pre-Spend Engine)': '14 milliseconds'
+        Metric: 'Offer',
+        'Vendorapp Startup': '200 AI pre-screens',
+        'tool-audit': 'One first-pass check'
       },
       {
-        Metric: 'Annual Cost',
-        'Human Vendor Review (OneTrust/Vanta/SIG)': '$15,000 – $35,000 / year',
-        'tool-audit (Pre-Spend Engine)': '$0.00 (Self-Hosted / Open)'
+        Metric: 'Price',
+        'Vendorapp Startup': '$149/month',
+        'tool-audit': '$0.2385 measured'
       },
       {
-        Metric: 'Friction to Call Tool',
-        'Human Vendor Review (OneTrust/Vanta/SIG)': '180-Question Security Spreadsheet',
-        'tool-audit (Pre-Spend Engine)': 'Automated Schema & Egress Contract Check'
+        Metric: 'Pricing model',
+        'Vendorapp Startup': 'Subscription',
+        'tool-audit': 'Three Monid calls'
       },
       {
-        Metric: 'Autonomous Agent Ready?',
-        'Human Vendor Review (OneTrust/Vanta/SIG)': 'NO (Requires Security Staff & CISO)',
-        'tool-audit (Pre-Spend Engine)': 'YES (Instant Machine Verdict)'
+        Metric: 'Scope',
+        'Vendorapp Startup': 'Vendor management platform',
+        'tool-audit': 'Before-spend evidence only'
       },
       {
-        Metric: 'Economic Protection',
-        'Human Vendor Review (OneTrust/Vanta/SIG)': 'None (Manual invoice audits)',
-        'tool-audit (Pre-Spend Engine)': 'Enforces Max Spend Ceilings & Bound Limits'
+        Metric: 'Free tier',
+        'Vendorapp Startup': '15 pre-screens on Basic',
+        'tool-audit': 'No subscription; calls are metered'
       }
     ]);
-    console.log(`\nTry scanning a tool:\n  npx tsx src/cli.ts audit apify/tiktok-scraper\n  npx tsx src/cli.ts audit unvetted/unbounded-data-leak\n`);
+    console.log(`\nAt 200 identical checks: $47.70 raw Monid call cost vs. $149/month.`);
+    console.log(`Hosting and engineering are excluded; the scopes are not identical.\n`);
     return;
   }
 
   if (command === 'audit') {
-    const toolId = args[1] || 'apify/tiktok-scraper';
+    const toolId = args[1] || 'api.strale.io:/x402/header-security-check';
     const client = new MonidClient();
     const auditor = new ToolAuditor();
-
     const tool = await client.inspect(toolId);
-    if (!tool) {
-      console.error(`❌ Tool '${toolId}' not found in catalog.`);
-      process.exit(1);
-    }
-
-    console.log(`🔍 Inspecting Tool: ${tool.name} (${tool.id})`);
-    console.log(`📡 URL: ${tool.url} [${tool.method}]`);
-    console.log(`💰 Pricing: $${tool.pricing.baseFeeUsd} (${tool.pricing.model})`);
+    if (!tool) throw new Error(`Tool '${toolId}' was not returned by Monid inspect.`);
 
     const verdict = auditor.audit(tool);
-    console.log(`\n📋 AUDIT VERDICT: [ ${verdict.status} ] (Score: ${verdict.score}/100)`);
-    console.log(`   Estimated Max Cost: $${verdict.maxEstimatedCostUsd}`);
-    console.log(`   Audit Hash: ${verdict.auditHash.slice(0, 16)}...`);
+    console.log(JSON.stringify({ tool, verdict }, null, 2));
+    if (verdict.status === 'BLOCKED') process.exitCode = 2;
+    return;
+  }
 
-    if (verdict.findings.length > 0) {
-      console.log(`\n⚠️  Findings (${verdict.findings.length}):`);
-      verdict.findings.forEach((f, i) => {
-        console.log(`   ${i + 1}. [${f.severity}] ${f.title}`);
-        console.log(`      ${f.description}`);
-        console.log(`      💡 Fix: ${f.recommendation}`);
-      });
-    } else {
-      console.log(`\n✅ No security or economic vulnerabilities detected.`);
-    }
-
-    if (verdict.status === 'BLOCKED') {
-      console.log(`\n🛑 EXECUTION REFUSED: Tool violates security or economic policy.`);
-      process.exit(2);
-    } else {
-      console.log(`\n🚀 APPROVED: Tool is safe for autonomous execution.`);
-    }
+  if (command === 'discover-audit') {
+    const query = args[1] || 'vendor security compliance';
+    const result = await discoverInspectAndAudit(query);
+    console.log(JSON.stringify(result, null, 2));
+    if (result.step === 'REFUSED') process.exitCode = 2;
     return;
   }
 
   if (command === 'consume') {
-    const query = args[1] || 'tiktok';
-    console.log(`🤖 Agent requesting: "${query}"`);
-    console.log(`⏳ Running consume path: Discover → Inspect → Audit → Execute...`);
-    const res = await executeWithAudit(query, { query: 'crypto news' });
-    console.log(`\nFinal Pipeline Step: ${res.step}`);
-    if (res.verdict) {
-      console.log(`Audit Verdict: ${res.verdict.status} (Score ${res.verdict.score}/100)`);
+    if (!args.includes('--confirm-spend')) {
+      console.error(`🛑 Refused: consume can spend Monid balance. Re-run with --confirm-spend.`);
+      process.exitCode = 2;
+      return;
     }
-    if (res.execution) {
-      console.log(`Execution Succeeded! Charged: $${res.execution.chargedUsd}`);
-      console.log(JSON.stringify(res.execution.result, null, 2));
-    } else {
-      console.log(`Refusal: ${res.refusalReason}`);
+    const query = args[1] || 'vendor security compliance';
+    const inputIndex = args.indexOf('--input');
+    const input = inputIndex >= 0 && args[inputIndex + 1]
+      ? JSON.parse(args[inputIndex + 1])
+      : {};
+    const result = await executeWithAudit(query, input, { confirmSpend: true });
+    console.log(JSON.stringify(result, null, 2));
+    if (result.step === 'REFUSED') process.exitCode = 2;
+    return;
+  }
+
+  if (command === 'prescreen') {
+    if (!args.includes('--confirm-spend')) {
+      console.error(`🛑 Refused: prescreen makes three paid Monid calls. Re-run with --confirm-spend.`);
+      process.exitCode = 2;
+      return;
     }
+    const targetUrl = args[1] || 'https://monid.ai';
+    const maxIndex = args.indexOf('--max-total');
+    const maxTotalUsd = maxIndex >= 0 ? Number(args[maxIndex + 1]) : 0.24;
+    console.log(`🔎 Pre-screening ${targetUrl} with a $${maxTotalUsd.toFixed(4)} total ceiling...`);
+    const report = await runVendorPrescreen(targetUrl, {
+      confirmSpend: true,
+      maxTotalUsd
+    });
+    console.log(JSON.stringify(report, null, 2));
     return;
   }
 
   console.log(`Usage:`);
-  console.log(`  tool-audit compare           Show vendor questionnaire comparison`);
-  console.log(`  tool-audit audit <toolId>    Audit a specific Monid tool`);
-  console.log(`  tool-audit consume <query>   Full consume loop: Discover -> Inspect -> Audit -> Run`);
+  console.log(`  tool-audit compare`);
+  console.log(`  tool-audit audit <provider:/endpoint>`);
+  console.log(`  tool-audit discover-audit "<query>"`);
+  console.log(`  tool-audit consume "<query>" --input '<json>' --confirm-spend`);
+  console.log(`  tool-audit prescreen <https-url> --max-total 0.24 --confirm-spend`);
 }
 
-main().catch(err => {
-  console.error('Fatal CLI Error:', err);
+main().catch(error => {
+  console.error(error instanceof Error ? error.message : 'Unknown CLI failure.');
   process.exit(1);
 });

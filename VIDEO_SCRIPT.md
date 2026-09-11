@@ -1,56 +1,37 @@
-# 60-Second Video Script: `tool-audit` 🛡️
-**Monid "We Kill" Hackathon Submission**  
-**Target Duration:** ~65 seconds (Hard limit: < 90 seconds)
+# Submission video
 
----
+Final export:
 
-### [0:00 – 0:15] The Hook & The Incumbent
-**Visual:** Show OneTrust / Vanta Vendor Risk pricing page or an ugly 180-question Vendor Security Questionnaire spreadsheet on screen.  
-**Voiceover:**  
-> *"In enterprise software, whenever an engineer wants to call a third-party API, security hands them a 180-question vendor risk questionnaire. It costs $25,000 a year for OneTrust or Vanta, and it takes 3 weeks of human review before anyone can make a single request.*  
-> *For autonomous AI agents calling tools on Monid, a 3-week human questionnaire is a non-starter. So we killed it."*
+- Duration: **56.496 seconds**
+- Format: H.264 video + AAC audio in MP4
+- Resolution: 1280×720
+- Captions: burned in
+- File: `tool-audit-submission.mp4` (kept outside Git)
 
----
+## Frames
 
-### [0:15 – 0:40] The Kill: Terminal Demo
-**Visual:** Terminal showing `tool-audit` running live.  
-**Action 1:** Run `tool-audit compare`  
-**Voiceover:**  
-> *"Meet `tool-audit`. We replaced the 21-day questionnaire with a 14-millisecond automated pre-spend contract audit for $0.00."*
+1. `0:00–0:03` — tool-audit outcome
+2. `0:03–0:10` — Vendorapp's live public pricing page
+3. `0:10–0:32` — three completed Monid receipts and measured cost
+4. `0:32–0:51` — evidence, uncertainty, and `review_required`
+5. `0:51–0:57` — live demo and source call to action
 
-**Action 2:** Run `tool-audit audit apify/tiktok-scraper`  
-**Voiceover:**  
-> *"When an agent discovers a tool on Monid, `tool-audit` inspects the contract before spending a single cent. It checks transport encryption, credential hygiene, and pricing ceilings. Apify TikTok scraper? Approved in 12 milliseconds for $0.0057 per call."*
+## Narration
 
-**Action 3:** Run `tool-audit audit unvetted/unbounded-data-leak`  
-**Voiceover:**  
-> *"Now watch what happens when an endpoint leaks an API key in the query string or has an unbounded per-result multiplier: Instantly BLOCKED. Zero dollars spent, wallet protected, and a cryptographic refusal card issued."*
+> We killed the first-pass vendor questionnaire. Vendorapp's published
+> Startup plan is 149 dollars a month for 200 AI pre-screens. Tool Audit
+> turns that workflow into three on-demand Monid calls. First, Context dot
+> dev retrieves the live price for nine hundredths of a cent. Then Strale
+> measures security headers for 5.94 cents, and cookie-consent evidence for
+> 17.82 cents. Total measured cost: 23.85 cents. The report found six missing
+> headers and refused to call the cookie result clean, because JavaScript
+> cookies and full HTML were not verified. The answer is review required,
+> not a fake green check. This replaces first-pass intake only, not
+> continuous monitoring, remediation, contracts, or human judgment. Check
+> the live demo and source. Hashtag Monid.
 
----
+## Public surfaces shown
 
-### [0:40 – 0:55] Live Web Surface & Architecture
-**Visual:** Switch to browser showing `https://rental-registered-graph-nec.trycloudflare.com` with the live audit matrix and API docs.  
-**Voiceover:**  
-> *"It's live right now at our public HTTPS endpoint. Any agent framework can call our POST /v1/audit API or import the SDK directly into their Monid consume loop: Discover, Inspect, Audit, Run."*
-
----
-
-### [0:55 – 1:05] The Outro
-**Visual:** Split screen showing:  
-- Left: OneTrust $25,000 / 21 Days  
-- Right: tool-audit $0.00 / 14 Milliseconds  
-**Voiceover:**  
-> *"OneTrust charges $25,000 a year for human bureaucracy. `tool-audit` gives agents instant trust for zero dollars. We killed vendor questionnaires."*
-
----
-
-## Recording Checklist:
-1. Terminal open with clean font (e.g., JetBrains Mono 16pt).
-2. Browser tab open to `https://rental-registered-graph-nec.trycloudflare.com`.
-3. Commands ready to paste:
-   ```bash
-   node dist/cli.js compare
-   node dist/cli.js audit apify/tiktok-scraper
-   node dist/cli.js audit unvetted/unbounded-data-leak
-   ```
-4. Export as MP4 (< 90 seconds).
+- https://vendorapp.co/pricing/
+- https://twzrd-sol.github.io/tool-audit/receipt.html
+- https://twzrd-sol.github.io/tool-audit/

@@ -3,7 +3,11 @@
   "version": "0.1.0",
   "description": "Kill vendor security questionnaires with an automated pre-spend tool audit for AI agents",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "bin": {
     "tool-audit": "./dist/cli.js"
   },
@@ -11,7 +15,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "tsx src/server.ts",
-    "test": "node --test dist/**/*.test.js"
+    "test": "npm run build && node --test dist/**/*.test.js"
   },
   "keywords": ["monid", "agent-security", "vendor-audit", "pre-spend", "mcp"],
   "author": "twzrd",
