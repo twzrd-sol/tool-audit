@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { runVendorPrescreen, PrescreenRefusalError } from './vendor-prescreen.js';
+import {
+  COOKIE_UNCERTAINTY_LIMITATION,
+  PrescreenRefusalError,
+  runVendorPrescreen
+} from './vendor-prescreen.js';
 import type { MonidEndpoint, MonidRun } from './types.js';
 
 const endpoints: Record<string, MonidEndpoint> = {
@@ -147,6 +151,11 @@ test('runVendorPrescreen returns measured receipts and explicit uncertainty', as
   assert.equal(report.receipts.length, 3);
   assert.equal(report.findings.missingSecurityHeaders.length, 1);
   assert.match(report.findings.cookiePotentialIssues[1], /Insufficient HTML data/);
+  assert.ok(
+    report.findings.cookiePotentialIssues.some(issue =>
+      /partial HTML|Unable to verify|UNABLE_TO_VERIFY/i.test(issue)
+    )
+  );
   assert.deepEqual(client.runInputs[0].input, {
     queryParams: {
       url: 'https://vendorapp.co/pricing',
@@ -206,6 +215,37 @@ test('runVendorPrescreen refuses an inspect identity substitution before spendin
       client
     ),
     /Inspect identity mismatch/
+  );
+});
+
+test('runVendorPrescreen refuses a negative advertised PER_CALL price before spending', async () => {
+  const base = fakeClient();
+  const client = {
+    ...base,
+    async inspect(toolId: string): Promise<MonidEndpoint | null> {
+      const endpoint = await base.inspect(toolId);
+      return endpoint
+        ? {
+            ...endpoint,
+            pricing: {
+              ...endpoint.pricing,
+              baseFeeUsd: -0.01
+            }
+          }
+        : null;
+    },
+    async run(): Promise<MonidRun> {
+      throw new Error('run must not be called');
+    }
+  };
+
+  await assert.rejects(
+    runVendorPrescreen(
+      'https://monid.ai',
+      { confirmSpend: true },
+      client
+    ),
+    /PER_CALL\/USD/
   );
 });
 
@@ -276,7 +316,7 @@ test('runVendorPrescreen rejects missing provider status and non-USD receipts', 
       { confirmSpend: true },
       client
     ),
-    /usable cost receipt/
+    /usable USD cost receipt/
   );
 });
 
@@ -302,6 +342,7 @@ test('runVendorPrescreen makes missing result evidence explicit', async () => {
 
   assert.match(report.findings.headerPotentialIssues[0], /omitted/);
   assert.match(report.findings.cookiePotentialIssues[0], /absence.*not approval/i);
+  assert.ok(report.findings.cookiePotentialIssues.includes(COOKIE_UNCERTAINTY_LIMITATION));
   assert.equal(report.verdict, 'review_required');
 });
 

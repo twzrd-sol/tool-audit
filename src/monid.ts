@@ -1,3 +1,4 @@
+import { getProviderHttpStatus, getUsdCost } from './receipt.js';
 import type { MonidEndpoint, MonidRun, MonidRunStatus } from './types.js';
 
 type FetchLike = typeof fetch;
@@ -183,10 +184,7 @@ export class MonidClient {
     const amountCurrency = String(amount.currency || 'UNKNOWN').toUpperCase();
     const flatFeeCurrency = String(price.flatFee?.currency || amountCurrency).toUpperCase();
     const currency = amountCurrency === flatFeeCurrency ? amountCurrency : 'MIXED';
-    const method = String(raw.method || 'POST').toUpperCase();
-    const supportedMethod = ['GET', 'POST', 'PUT', 'DELETE'].includes(method)
-      ? method as MonidEndpoint['method']
-      : 'POST';
+    const method = String(raw.method || 'UNKNOWN').toUpperCase();
 
     let model: MonidEndpoint['pricing']['model'] = 'unsupported';
     let baseFeeUsd = -1;
@@ -206,7 +204,7 @@ export class MonidClient {
       provider,
       description: raw.description || raw.summary || '',
       url: `${this.baseUrl}/run`,
-      method: supportedMethod,
+      method,
       inputSchema,
       pricing: {
         model,
@@ -277,6 +275,16 @@ export class MonidClient {
     }
   }
 
+  private assertCompletedReceipt(run: MonidRun): void {
+    if (run.status !== 'COMPLETED') return;
+    if (getProviderHttpStatus(run) === undefined || getUsdCost(run) === undefined) {
+      throw new MonidApiError(
+        502,
+        `Monid run ${run.runId} omitted an explicit provider HTTP status or USD cost.`
+      );
+    }
+  }
+
   public async run(
     toolId: string,
     input: Record<string, unknown>,
@@ -326,7 +334,10 @@ export class MonidClient {
       throw new Error('Monid run pollMs must be positive.');
     }
     const deadline = Date.now() + timeoutMs;
-    if (options.wait === false) return run;
+    if (options.wait === false) {
+      this.assertCompletedReceipt(run);
+      return run;
+    }
 
     let latest = run;
     while (
@@ -342,6 +353,7 @@ export class MonidClient {
         throw new MonidPendingRunError(run.runId, error);
       }
     }
+    this.assertCompletedReceipt(latest);
     return latest;
   }
 }

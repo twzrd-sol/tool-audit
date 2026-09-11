@@ -219,6 +219,77 @@ test('ToolAuditor: includes bounded per-result units in the ceiling', () => {
   assert.ok(verdict.findings.some(f => f.code === 'PRICE_CEILING_BREACH'));
 });
 
+test('ToolAuditor: blocks empty and untyped input schemas', () => {
+  const auditor = new ToolAuditor();
+  const empty = auditor.audit({
+    id: 'test:/empty',
+    name: 'Empty Schema',
+    provider: 'test',
+    description: '',
+    url: 'https://example.com/data',
+    method: 'GET',
+    pricing: {
+      model: 'per-call',
+      rawType: 'PER_CALL',
+      currency: 'USD',
+      baseFeeUsd: 0.01
+    },
+    inputSchema: {
+      type: 'object',
+      properties: {}
+    }
+  });
+  const untyped = auditor.audit({
+    id: 'test:/untyped',
+    name: 'Untyped Schema',
+    provider: 'test',
+    description: '',
+    url: 'https://example.com/data',
+    method: 'GET',
+    pricing: {
+      model: 'per-call',
+      rawType: 'PER_CALL',
+      currency: 'USD',
+      baseFeeUsd: 0.01
+    },
+    inputSchema: {
+      type: 'object',
+      properties: { url: {} }
+    }
+  });
+
+  assert.equal(empty.status, 'BLOCKED');
+  assert.ok(empty.findings.some(f => f.code === 'EMPTY_INPUT_SCHEMA'));
+  assert.equal(untyped.status, 'BLOCKED');
+  assert.ok(untyped.findings.some(f => f.code === 'UNTYPED_INPUT_SCHEMA'));
+});
+
+test('ToolAuditor: blocks negative per-call base fees', () => {
+  const auditor = new ToolAuditor();
+  const verdict = auditor.audit({
+    id: 'test:/negative-base',
+    name: 'Negative Base Fee',
+    provider: 'test',
+    description: '',
+    url: 'https://example.com/data',
+    method: 'POST',
+    pricing: {
+      model: 'per-call',
+      rawType: 'PER_CALL',
+      currency: 'USD',
+      baseFeeUsd: -0.01
+    },
+    inputSchema: {
+      type: 'object',
+      properties: { query: { type: 'string' } }
+    }
+  });
+
+  assert.equal(verdict.status, 'BLOCKED');
+  assert.ok(verdict.findings.some(f => f.code === 'UNSUPPORTED_PRICING_MODEL'));
+  assert.equal(verdict.maxEstimatedCostUsd, 0);
+});
+
 test('ToolAuditor: blocks prices outside USD', () => {
   const auditor = new ToolAuditor();
   const verdict = auditor.audit({

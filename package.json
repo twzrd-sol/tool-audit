@@ -1,24 +1,70 @@
 {
   "name": "tool-audit",
   "version": "0.1.0",
-  "description": "Kill vendor security questionnaires with an automated pre-spend tool audit for AI agents",
+  "description": "First-pass vendor evidence before an agent spends on the downstream tool. Three measured Monid calls; not a Vendorapp replacement.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "engines": {
     "node": ">=20"
   },
+  "packageManager": "npm@10.9.2",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "bin": {
     "tool-audit": "./dist/cli.js"
   },
+  "files": [
+    "dist/auditor.js",
+    "dist/auditor.d.ts",
+    "dist/cli.js",
+    "dist/index.js",
+    "dist/index.d.ts",
+    "dist/monid.js",
+    "dist/monid.d.ts",
+    "dist/receipt.js",
+    "dist/receipt.d.ts",
+    "dist/server.js",
+    "dist/server.d.ts",
+    "dist/types.js",
+    "dist/types.d.ts",
+    "dist/vendor-prescreen.js",
+    "dist/vendor-prescreen.d.ts",
+    "evidence",
+    "README.md",
+    "LICENSE",
+    ".env.example"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/twzrd-sol/tool-audit.git"
+  },
+  "homepage": "https://github.com/twzrd-sol/tool-audit#readme",
+  "bugs": {
+    "url": "https://github.com/twzrd-sol/tool-audit/issues"
+  },
   "scripts": {
     "build": "tsc",
+    "prepare": "tsc",
+    "prepack": "tsc",
     "start": "node dist/server.js",
     "dev": "tsx src/server.ts",
-    "test": "npm run build && node --test dist/**/*.test.js",
-    "verify:evidence": "npm run build && node scripts/verify-evidence.mjs"
+    "test": "npm run build && node --test dist/audit.test.js dist/evidence.test.js dist/monid.test.js dist/vendor-prescreen.test.js && node scripts/verify-snapshot.mjs",
+    "verify:snapshot": "node scripts/verify-snapshot.mjs",
+    "verify:evidence": "npm run build && node scripts/verify-evidence.mjs",
+    "pack:check": "npm pack --dry-run"
   },
-  "keywords": ["monid", "agent-security", "vendor-audit", "pre-spend", "mcp"],
+  "keywords": [
+    "monid",
+    "agent-security",
+    "vendor-audit",
+    "pre-spend",
+    "mcp"
+  ],
   "author": "twzrd",
   "license": "MIT",
   "devDependencies": {

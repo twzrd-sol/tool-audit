@@ -1,54 +1,27 @@
+import { readFileSync } from 'node:fs';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { ToolAuditor } from './auditor.js';
 import type { MonidEndpoint } from './types.js';
 
 const PORT = Number(process.env.PORT) || 8787;
 const MAX_BODY_BYTES = 256 * 1024;
 const auditor = new ToolAuditor();
+const measuredDemo = JSON.parse(
+  readFileSync(
+    join(dirname(fileURLToPath(import.meta.url)), '..', 'evidence', 'measured-demo.json'),
+    'utf8'
+  )
+) as {
+  kind?: string;
+  snapshotUrl: string;
+  [key: string]: unknown;
+};
 
-const measuredDemo = {
-  schema: 'tool-audit.measured-demo.v1',
-  measuredAt: '2026-09-11T01:02:11.304Z',
-  targetUrl: 'https://monid.ai',
-  incumbent: {
-    name: 'Vendorapp Startup',
-    pricingUrl: 'https://vendorapp.co/pricing/',
-    monthlyPriceUsd: 149,
-    includedPrescreens: 200,
-    freeTierPrescreens: 15
-  },
-  verdict: 'review_required',
-  receipts: [
-    {
-      purpose: 'incumbent_price',
-      runId: '01M26ZQCF2RTDKB9WQ5XBQX3EW',
-      provider: 'context.dev',
-      endpoint: '/web/scrape/markdown',
-      costUsd: 0.0009
-    },
-    {
-      purpose: 'security_headers',
-      runId: '01M26ZRF377CFWF9SAQF94MHXD',
-      provider: 'api.strale.io',
-      endpoint: '/x402/header-security-check',
-      costUsd: 0.0594
-    },
-    {
-      purpose: 'cookie_consent',
-      runId: '01M26ZRWB37QR0XZ72ED0KESAJ',
-      provider: 'api.strale.io',
-      endpoint: '/x402/v2/cookie-scan',
-      costUsd: 0.1782
-    }
-  ],
-  measuredCostUsd: 0.2385,
-  limitations: [
-    'The cookie scan analyzed partial HTML and did not observe JavaScript-set cookies.',
-    'This replaces first-pass evidence collection, not monitoring, remediation, contracts, or human judgment.'
-  ],
-  liveDemoUrl: 'https://twzrd-sol.github.io/tool-audit/',
-  sourceUrl: 'https://github.com/twzrd-sol/tool-audit'
-} as const;
+if (measuredDemo.kind !== 'measured-snapshot' || typeof measuredDemo.snapshotUrl !== 'string') {
+  throw new Error('evidence/measured-demo.json must be a labeled measured snapshot with snapshotUrl.');
+}
 
 function setHeaders(response: ServerResponse): void {
   response.setHeader('Access-Control-Allow-Origin', '*');
@@ -114,7 +87,7 @@ const server = createServer(async (request, response) => {
   }
 
   if (url.pathname === '/' && request.method === 'GET') {
-    response.writeHead(302, { Location: measuredDemo.liveDemoUrl });
+    response.writeHead(302, { Location: measuredDemo.snapshotUrl });
     response.end();
     return;
   }

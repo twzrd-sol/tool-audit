@@ -1,5 +1,7 @@
 {
   "schema": "tool-audit.measured-demo.v2",
+  "kind": "measured-snapshot",
+  "label": "Static measured snapshot from 2026-09-11. Not a live query.",
   "measuredAt": "2026-09-11T01:02:11.304Z",
   "targetUrl": "https://monid.ai",
   "incumbent": {
@@ -108,6 +110,6 @@
     "The cookie scan analyzed partial HTML and did not observe JavaScript-set cookies.",
     "This replaces first-pass evidence collection, not monitoring, remediation, contracts, or human judgment."
   ],
-  "liveDemoUrl": "https://twzrd-sol.github.io/tool-audit/",
+  "snapshotUrl": "https://twzrd-sol.github.io/tool-audit/",
   "sourceUrl": "https://github.com/twzrd-sol/tool-audit"
 }

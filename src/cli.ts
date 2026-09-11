@@ -101,12 +101,14 @@ async function main() {
     return;
   }
 
+  console.error(`Unknown command: ${command}`);
   console.log(`Usage:`);
   console.log(`  tool-audit compare`);
   console.log(`  tool-audit audit <provider:/endpoint>`);
   console.log(`  tool-audit discover-audit "<query>"`);
   console.log(`  tool-audit consume "<query>" --input '<json>' --confirm-spend`);
   console.log(`  tool-audit prescreen <https-url> --max-total 0.24 --confirm-spend`);
+  process.exitCode = 2;
 }
 
 main().catch(error => {

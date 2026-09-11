@@ -1,5 +1,6 @@
 import { ToolAuditor } from './auditor.js';
 import { MonidClient } from './monid.js';
+import { describeReceipt, getProviderHttpStatus, getUsdCost, isSuccessfulUsdReceipt } from './receipt.js';
 import type {
   AuditPolicy,
   MonidEndpoint,
@@ -42,11 +43,21 @@ const REQUIRED_TOOLS: RequiredTool[] = [
   }
 ];
 
+export const COOKIE_UNCERTAINTY_LIMITATION =
+  'UNABLE_TO_VERIFY: only partial HTML was analyzed and JavaScript-set cookies were not observed.';
+
 export class PrescreenRefusalError extends Error {
   constructor(message: string) {
     super(message);
     this.name = 'PrescreenRefusalError';
   }
+}
+
+function withCookieUncertainty(issues: string[]): string[] {
+  if (issues.some(issue => /unable_to_verify|javascript-set cookies|partial HTML/i.test(issue))) {
+    return issues;
+  }
+  return [...issues, COOKIE_UNCERTAINTY_LIMITATION];
 }
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -65,37 +76,28 @@ function requireCredentialFreeHttpsUrl(value: string, label: string): URL {
 }
 
 function assertSuccessfulRun(run: MonidRun, purpose: string): void {
-  const providerStatus = run.providerResponse?.httpStatus;
-  if (
-    run.status !== 'COMPLETED' ||
-    !Number.isInteger(providerStatus) ||
-    (providerStatus ?? 0) < 200 ||
-    (providerStatus ?? 0) >= 300
-  ) {
+  if (!isSuccessfulUsdReceipt(run)) {
     throw new PrescreenRefusalError(
-      `${purpose} run ${run.runId} ended with ${run.status} / HTTP ${String(providerStatus)}.`
+      `${purpose} run ${run.runId} ended with ${describeReceipt(run)} and no usable USD cost receipt.`
     );
-  }
-  if (
-    !run.cost ||
-    run.cost.currency !== 'USD' ||
-    !Number.isFinite(run.cost.value) ||
-    run.cost.value < 0
-  ) {
-    throw new PrescreenRefusalError(`${purpose} run ${run.runId} omitted a usable cost receipt.`);
   }
 }
 
 function receipt(purpose: RequiredTool['purpose'], run: MonidRun): PrescreenRunReceipt {
+  const costUsd = getUsdCost(run);
+  const providerHttpStatus = getProviderHttpStatus(run);
+  if (costUsd === undefined || providerHttpStatus === undefined) {
+    throw new PrescreenRefusalError(`${purpose} run ${run.runId} omitted a usable USD receipt.`);
+  }
   return {
     purpose,
     runId: run.runId,
     provider: run.provider,
     endpoint: run.endpoint,
     status: run.status,
-    costUsd: run.cost?.value ?? 0,
+    costUsd,
     currency: 'USD',
-    providerHttpStatus: run.providerResponse!.httpStatus!
+    providerHttpStatus
   };
 }
 
@@ -122,7 +124,13 @@ async function discoverInspectAndAuditRequiredTools(
         `Inspect identity mismatch: requested ${required.id}, received ${endpoint.id}.`
       );
     }
-    if (endpoint.pricing.model !== 'per-call' || endpoint.pricing.currency !== 'USD') {
+    if (
+      endpoint.pricing.model !== 'per-call' ||
+      endpoint.pricing.rawType !== 'PER_CALL' ||
+      endpoint.pricing.currency !== 'USD' ||
+      !Number.isFinite(endpoint.pricing.baseFeeUsd) ||
+      endpoint.pricing.baseFeeUsd < 0
+    ) {
       throw new PrescreenRefusalError(
         `Required endpoint ${required.id} must remain bounded PER_CALL/USD pricing.`
       );
@@ -241,9 +249,11 @@ export async function runVendorPrescreen(
   const parsedCookieIssues = Array.isArray(cookieOutput.potential_issues)
     ? cookieOutput.potential_issues.filter((item): item is string => typeof item === 'string')
     : [];
-  const cookiePotentialIssues = parsedCookieIssues.length > 0
-    ? parsedCookieIssues
-    : ['Cookie scan returned no limitation details; absence of reported issues is not approval.'];
+  const cookiePotentialIssues = withCookieUncertainty(
+    parsedCookieIssues.length > 0
+      ? parsedCookieIssues
+      : ['Cookie scan returned no limitation details; absence of reported issues is not approval.']
+  );
   const receipts = [
     receipt('incumbent_price', priceRun),
     receipt('security_headers', headerRun),

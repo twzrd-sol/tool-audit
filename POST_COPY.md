@@ -8,7 +8,7 @@ We killed the first-pass vendor questionnaire.
 Vendorapp: $149/mo for 200 AI pre-screens.
 tool-audit: $0.2385 measured.
 
-3 live Monid calls check price, headers + cookies before an agent spends—without inventing certainty.
+3 Monid calls check price, headers + cookies before an agent spends on the downstream tool—without inventing certainty.
 
 https://twzrd-sol.github.io/tool-audit/
 #monid
@@ -23,18 +23,20 @@ YouTube link. `#monid` must remain in the post body.
 We killed the first-pass vendor questionnaire.
 
 Vendorapp's public Startup plan is $149/month for 200 AI pre-screens. Our
-narrower tool-audit check cost $0.2385 in a measured live run.
+narrower tool-audit check cost $0.2385 in a measured run.
 
 It uses three Monid calls to retrieve the incumbent's current offer, inspect
-security headers, and assess cookie/consent evidence before an agent spends.
-The demo found real header issues and returned review_required—not a fake
-green check—because the cookie scan could not verify JavaScript-set cookies or
-the full HTML.
+security headers, and assess cookie/consent evidence before an agent spends
+on the downstream tool. The snapshot found real header issues and returned
+review_required because the cookie scan could not verify JavaScript-set
+cookies or the full HTML.
 
 This replaces first-pass evidence collection only, not monitoring,
-remediation, contracts, or human judgment.
+remediation, contracts, or human judgment. Vendorapp Basic includes 15 AI
+pre-screens per month, always free. 200 repetitions at the measured rates
+would cost $47.70; that is not 200 Vendorapp AI pre-screens.
 
-Live demo: https://twzrd-sol.github.io/tool-audit/
+Measured snapshot: https://twzrd-sol.github.io/tool-audit/
 Source: https://github.com/twzrd-sol/tool-audit
 
 #monid

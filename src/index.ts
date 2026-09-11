@@ -1,10 +1,12 @@
 import { ToolAuditor } from './auditor.js';
 import { MonidClient } from './monid.js';
+import { describeReceipt, isSuccessfulUsdReceipt } from './receipt.js';
 import type { MonidEndpoint, AuditPolicy, AuditVerdict, MonidRun } from './types.js';
 
 export * from './types.js';
 export * from './auditor.js';
 export * from './monid.js';
+export * from './receipt.js';
 export * from './vendor-prescreen.js';
 
 export interface AuditAndExecuteResult {
@@ -41,11 +43,18 @@ export async function discoverInspectAndAudit(
       };
     }
 
-    const tool = await client.inspect(candidates[0].id);
+    const requestedId = candidates[0].id;
+    const tool = await client.inspect(requestedId);
     if (!tool) {
       return {
         step: 'REFUSED',
-        refusalReason: `Failed to inspect tool metadata for '${candidates[0].id}'.`
+        refusalReason: `Failed to inspect tool metadata for '${requestedId}'.`
+      };
+    }
+    if (tool.id !== requestedId) {
+      return {
+        step: 'REFUSED',
+        refusalReason: `Inspect identity mismatch: requested ${requestedId}, received ${tool.id}.`
       };
     }
 
@@ -101,24 +110,13 @@ export async function executeWithAudit(
   try {
     const client = new MonidClient(options.monidApiKey);
     const execution = await client.run(audited.tool.id, executionParams);
-    const providerStatus = execution.providerResponse?.httpStatus;
-    const usableCost =
-      execution.cost?.currency === 'USD' &&
-      Number.isFinite(execution.cost.value) &&
-      execution.cost.value >= 0;
-    if (
-      execution.status !== 'COMPLETED' ||
-      !Number.isInteger(providerStatus) ||
-      (providerStatus ?? 0) < 200 ||
-      (providerStatus ?? 0) >= 300 ||
-      !usableCost
-    ) {
+    if (!isSuccessfulUsdReceipt(execution)) {
       return {
         step: 'REFUSED',
         tool: audited.tool,
         verdict: audited.verdict,
         execution,
-        refusalReason: `Monid run ${execution.runId} lacked a successful 2xx USD receipt (${execution.status} / HTTP ${String(providerStatus)}).`
+        refusalReason: `Monid run ${execution.runId} lacked a successful 2xx USD receipt (${describeReceipt(execution)}).`
       };
     }
     return {

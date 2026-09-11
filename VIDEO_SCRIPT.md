@@ -18,17 +18,20 @@ Final export:
 
 ## Narration
 
-> We killed the first-pass vendor questionnaire. Vendorapp's published
-> Startup plan is 149 dollars a month for 200 AI pre-screens. Tool Audit
-> turns that workflow into three on-demand Monid calls. First, Context dot
-> dev retrieves the live price for nine hundredths of a cent. Then Strale
-> measures security headers for 5.94 cents, and cookie-consent evidence for
-> 17.82 cents. Total measured cost: 23.85 cents. The report found six missing
-> headers and refused to call the cookie result clean, because JavaScript
-> cookies and full HTML were not verified. The answer is review required,
-> not a fake green check. This replaces first-pass intake only, not
-> continuous monitoring, remediation, contracts, or human judgment. Check
-> the live demo and source. Hashtag Monid.
+> Vendorapp charges 149 dollars a month. We replaced its first-pass check
+> with three Monid calls costing 23 cents. Context dot dev retrieves the
+> current price for nine hundredths of a cent. Then Strale measures security
+> headers for 5.94 cents, and cookie-consent evidence for 17.82 cents. Total
+> measured cost: 23.85 cents, before an agent spends on the downstream tool.
+> The report found six missing headers and refused to call the cookie result
+> clean, because JavaScript cookies and full HTML were not verified. The
+> answer is review required. Narrower workflow; not a full Vendorapp
+> replacement. Check the measured snapshot and source. Hashtag Monid.
+
+Public pages are static measured snapshots from 2026-09-11, not live queries.
+Show the actual discovery queries (`extract web page content`, `website
+security headers`, `website cookie consent scan`), not
+`monid discover -q "vendor security pre-screen"`.
 
 ## Public surfaces shown
 

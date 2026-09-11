@@ -13,7 +13,7 @@ export interface MonidEndpoint {
   provider: string;
   description: string;
   url: string;
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method: string;
   inputSchema: {
     type?: string;
     properties?: Record<string, {

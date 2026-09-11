@@ -7,6 +7,7 @@ import {
   MonidConfigurationError
 } from './monid.js';
 import { executeWithAudit } from './index.js';
+import { ToolAuditor } from './auditor.js';
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -240,6 +241,123 @@ test('MonidClient bounds a paid request without retrying it', async () => {
       /Do not retry blindly/.test(error.message)
   );
   assert.equal(calls, 1);
+});
+
+test('MonidClient preserves unsupported HTTP methods for the auditor', async () => {
+  const client = new MonidClient(
+    'monid_live_test',
+    'https://api.monid.test/v1',
+    (async () => jsonResponse({
+      provider: 'example',
+      endpoint: '/patch',
+      method: 'PATCH',
+      input: {
+        queryParams: {
+          type: 'object',
+          properties: { url: { type: 'string' } }
+        }
+      },
+      price: {
+        type: 'PER_CALL',
+        amount: { value: 0.01, currency: 'USD' }
+      }
+    })) as typeof fetch
+  );
+
+  const inspected = await client.inspect('example:/patch');
+  assert.equal(inspected?.method, 'PATCH');
+  const verdict = new ToolAuditor().audit(inspected!);
+  assert.equal(verdict.status, 'BLOCKED');
+  assert.ok(verdict.findings.some(finding => finding.code === 'UNSUPPORTED_HTTP_METHOD'));
+});
+
+test('MonidClient refuses a completed run that omits HTTP status or USD cost', async () => {
+  const client = new MonidClient(
+    'monid_live_test',
+    'https://api.monid.test/v1',
+    (async () => jsonResponse({
+      runId: '01NORECEIPT',
+      provider: 'example',
+      endpoint: '/lookup',
+      status: 'COMPLETED',
+      cost: { value: 0.01, currency: 'EUR' }
+    })) as typeof fetch
+  );
+
+  await assert.rejects(
+    client.run('example:/lookup', {}, { wait: false }),
+    (error: unknown) =>
+      error instanceof MonidApiError &&
+      /explicit provider HTTP status or USD cost/.test(error.message)
+  );
+});
+
+test('executeWithAudit refuses a completed run without a 2xx USD receipt', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = (async (input: string | URL | Request) => {
+    const url = String(input);
+    if (url.endsWith('/discover')) {
+      return jsonResponse({
+        results: [{
+          provider: 'api.strale.io',
+          providerName: 'Strale',
+          endpoint: '/x402/header-security-check',
+          method: 'GET',
+          input: {
+            queryParams: {
+              type: 'object',
+              properties: { url: { type: 'string' } },
+              required: ['url']
+            }
+          },
+          price: {
+            type: 'PER_CALL',
+            amount: { value: 0.0594, currency: 'USD' }
+          }
+        }]
+      });
+    }
+    if (url.endsWith('/inspect')) {
+      return jsonResponse({
+        provider: 'api.strale.io',
+        providerName: 'Strale',
+        endpoint: '/x402/header-security-check',
+        method: 'GET',
+        input: {
+          queryParams: {
+            type: 'object',
+            properties: { url: { type: 'string' } },
+            required: ['url']
+          }
+        },
+        price: {
+          type: 'PER_CALL',
+          amount: { value: 0.0594, currency: 'USD' }
+        }
+      });
+    }
+    return jsonResponse({
+      runId: '01BADRECEIPT',
+      provider: 'api.strale.io',
+      endpoint: '/x402/header-security-check',
+      status: 'COMPLETED',
+      providerResponse: { httpStatus: 404 },
+      cost: { value: 0, currency: 'USD' }
+    });
+  }) as typeof fetch;
+
+  try {
+    const result = await executeWithAudit(
+      'security headers',
+      { queryParams: { url: 'https://monid.ai' } },
+      { confirmSpend: true, monidApiKey: 'monid_live_test' }
+    );
+    assert.equal(result.step, 'REFUSED');
+    assert.match(result.refusalReason || '', /2xx USD receipt/);
+    assert.equal(result.execution?.runId, '01BADRECEIPT');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test('MonidClient rejects a confused run identity', async () => {

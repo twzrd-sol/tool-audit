@@ -2,5 +2,8 @@
 POST_COPY.md
 VIDEO_SCRIPT.md
 src/
-dist/*.test.js
-dist/*.test.d.ts
+pages/
+scripts/
+**/*.test.js
+**/*.test.d.ts
+**/*.test.js.map

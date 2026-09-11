@@ -69,7 +69,7 @@ export class ToolAuditor {
 
     // Check query params in inputSchema
     if (tool.inputSchema?.properties) {
-      for (const [propName, propDef] of Object.entries(tool.inputSchema.properties)) {
+      for (const [propName] of Object.entries(tool.inputSchema.properties)) {
         const propLower = propName.toLowerCase();
         if (
           this.policy.disallowQueryAuth &&
@@ -160,8 +160,8 @@ export class ToolAuditor {
           recommendation: 'Require a server-validated hard maximum before estimating or authorizing spend.'
         });
         penaltyScore += 50;
-      } else if (validUnitFee) {
-        estimatedCost += unitFee * Math.max(...hardLimits);
+      } else if (validUnitFee && hardLimits.length > 0) {
+        estimatedCost += (unitFee ?? 0) * Math.max(...hardLimits);
       }
     }
 
@@ -194,6 +194,21 @@ export class ToolAuditor {
         recommendation: 'Demand structured JSON schema with explicit types and required property definitions.'
       });
       penaltyScore += 50;
+    } else if (this.policy.enforceTypedSchema && tool.inputSchema?.properties) {
+      const untyped = Object.entries(tool.inputSchema.properties)
+        .filter(([, definition]) => !definition?.type)
+        .map(([name]) => name);
+      if (untyped.length > 0) {
+        findings.push({
+          code: 'UNTYPED_INPUT_SCHEMA',
+          severity: 'CRITICAL',
+          category: 'CONTRACT_HONESTY',
+          title: 'Untyped Input Parameters',
+          description: `Parameters without a JSON Schema type: ${untyped.join(', ')}.`,
+          recommendation: 'Refuse execution until every accepted parameter has an explicit type.'
+        });
+        penaltyScore += 50;
+      }
     }
 
     // Check 6: Data Egress & Sensitive PII Targets
