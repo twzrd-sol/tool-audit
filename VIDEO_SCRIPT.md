@@ -2,39 +2,44 @@
 
 Final export:
 
-- Duration: **56.496 seconds**
-- Format: H.264 video + AAC audio in MP4
-- Resolution: 1280×720
-- Captions: burned in
+- Duration: **56 seconds**
+- Format: H.264 + silent AAC in MP4
+- Resolution: **1920×1080**
+- Captions: burned into the storyboard
 - File: `tool-audit-submission.mp4` (kept outside Git)
+- Storyboard: `pages/film.html`
 
 ## Frames
 
-1. `0:00–0:03` — tool-audit outcome
-2. `0:03–0:10` — Vendorapp's live public pricing page
-3. `0:10–0:32` — three completed Monid receipts and measured cost
-4. `0:32–0:51` — evidence, uncertainty, and `review_required`
-5. `0:51–0:57` — live demo and source call to action
+1. `0:00–0:05` — guide opening + three numbers
+2. `0:05–0:08` — scoped incumbent comparison
+3. `0:08–0:16` — live Monid **discover** output
+4. `0:16–0:22` — live Monid **inspect** (PER_CALL / USD)
+5. `0:22–0:32` — three **run** receipts + dual cost
+6. `0:32–0:43` — cookie `UNABLE_TO_VERIFY` / `REVIEW_REQUIRED`
+7. `0:43–0:52` — discover → inspect → run and spend boundary
+8. `0:52–0:56` — CTA
 
-## Narration
+## Narration / captions
 
-> Vendorapp charges 149 dollars a month. We replaced its first-pass check
-> with three Monid calls costing 23 cents. Context dot dev retrieves the
-> current price for nine hundredths of a cent. Then Strale measures security
-> headers for 5.94 cents, and cookie-consent evidence for 17.82 cents. Total
-> measured cost: 23.85 cents, before an agent spends on the downstream tool.
-> The report found six missing headers and refused to call the cookie result
-> clean, because JavaScript cookies and full HTML were not verified. The
-> answer is review required. Narrower workflow; not a full Vendorapp
-> replacement. Check the measured snapshot and source. Hashtag Monid.
+> Vendorapp charges $149 a month for 200 AI pre-screens. We replaced
+> its first-pass evidence check with three live Monid calls.
+>
+> Vendorapp: $149/mo. Monid chain: $0.2385. Total experiment spend: $0.2394.
+>
+> Live discover, then inspect, then run. This replaces first-pass
+> evidence collection before downstream tool spend—not monitoring,
+> remediation, contracts, or human review.
 
-Public pages are static measured snapshots from 2026-09-11, not live queries.
-Show the actual discovery queries (`extract web page content`, `website
-security headers`, `website cookie consent scan`), not
-`monid discover -q "vendor security pre-screen"`.
+Do not imply $0.2385 was the entire experiment cost. Show the earlier
+$0.0009 attempt (`01M272SPTD953E3M0WVHF2WSN2`) in the cost readout.
+
+Public pages are static measured snapshots from 2026-09-11, not live
+queries. The discover/inspect excerpt in the film is a free Monid call,
+not a paid run. Paid receipts remain the measured three-call chain.
 
 ## Public surfaces shown
 
-- https://vendorapp.co/pricing/
-- https://twzrd-sol.github.io/tool-audit/receipt.html
+- https://twzrd-sol.github.io/tool-audit/film.html
 - https://twzrd-sol.github.io/tool-audit/
+- https://twzrd-sol.github.io/tool-audit/receipt.html

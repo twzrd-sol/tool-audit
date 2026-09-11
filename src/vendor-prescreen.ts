@@ -283,11 +283,12 @@ export async function runVendorPrescreen(
     receipts,
     measuredCostUsd,
     scope: {
-      replaces: 'First-pass, before-spend vendor evidence collection.',
+      replaces: 'First-pass evidence collection before downstream tool spend.',
       doesNotReplace: [
-        'Continuous monitoring and remediation',
-        'Contract and vendor lifecycle management',
-        'Human review for material or ambiguous risk'
+        'Monitoring',
+        'Remediation',
+        'Contracts',
+        'Human review'
       ]
     },
     generatedAt: new Date().toISOString()

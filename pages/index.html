@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>tool-audit — measured snapshot</title>
-  <meta name="description" content="Static measured snapshot from 2026-09-11. Vendorapp $149/month vs three Monid calls at $0.2385. Verdict: review_required.">
+  <meta name="description" content="Static measured snapshot from 2026-09-11. Vendorapp $149/month vs Monid chain $0.2385. Total experiment spend $0.2394. Verdict: review_required.">
   <style>
     :root {
       --bg: #101114;
@@ -58,7 +58,7 @@
 <body>
   <main>
     <p class="kicker">Measured snapshot · 2026-09-11 UTC · not a live query</p>
-    <h1>Vendorapp charges $149 a month. Three Monid calls cost $0.2385.</h1>
+    <h1>Vendorapp charges $149 a month for 200 AI pre-screens. We replaced its first-pass evidence check with three live Monid calls.</h1>
     <p class="muted">This page reprints a completed run. It does not call Monid.</p>
     <section class="price">
       <div>
@@ -68,14 +68,15 @@
       <div class="muted">→</div>
       <div>
         <div class="num">$0.2385</div>
-        <div class="muted">tool-audit measured<br>3 live evidence calls</div>
+        <div class="muted">Successful Monid chain<br>3 live evidence calls</div>
       </div>
     </section>
-    <p class="muted">Narrower workflow; not a full Vendorapp replacement. Basic includes 15 AI pre-screens per month, always free. 200 repetitions at the measured rates would cost $47.70; that is not 200 Vendorapp AI pre-screens.</p>
+    <p>Total experiment spend: <strong>$0.2394</strong> <span class="muted">($0.2385 successful chain + $0.0009 earlier attempt <code>WSN2</code>)</span></p>
+    <p class="muted">This replaces first-pass evidence collection before downstream tool spend—not monitoring, remediation, contracts, or human review. Narrower workflow; not a full Vendorapp replacement. Basic includes 15 AI pre-screens per month, always free. 200 repetitions at the measured rates would cost $47.70; that is not 200 Vendorapp AI pre-screens.</p>
     <div class="steps">
       <span>DISCOVER</span>
       <span>INSPECT</span>
-      <span>AUDIT</span>
+      <span>RUN</span>
       <span class="on">REVIEW REQUIRED</span>
     </div>
     <div class="grid three">
@@ -113,7 +114,7 @@
     <pre><code>monid discover -q "extract web page content"
 monid discover -q "website security headers"
 monid discover -q "website cookie consent scan"</code></pre>
-    <p><a href="./receipt.html">Receipt page</a> · <a href="https://github.com/twzrd-sol/tool-audit">Source</a></p>
+    <p><a href="./receipt.html">Receipt page</a> · <a href="./film.html">1080p storyboard</a> · <a href="https://github.com/twzrd-sol/tool-audit">Source</a></p>
   </main>
 </body>
 </html>

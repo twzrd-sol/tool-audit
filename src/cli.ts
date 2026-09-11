@@ -22,7 +22,7 @@ async function main() {
       {
         Metric: 'Price',
         'Vendorapp Startup': '$149/month',
-        'tool-audit': '$0.2385 measured'
+        'tool-audit': '$0.2385 chain / $0.2394 campaign'
       },
       {
         Metric: 'Pricing model',
@@ -40,8 +40,9 @@ async function main() {
         'tool-audit': 'No subscription; calls are metered'
       }
     ]);
-    console.log(`\nAt 200 identical checks: $47.70 raw Monid call cost vs. $149/month.`);
-    console.log(`Hosting and engineering are excluded; the scopes are not identical.\n`);
+    console.log(`\nSuccessful chain $0.2385. Earlier attempt $0.0009. Campaign spend $0.2394.`);
+    console.log(`At 200 identical checks: $47.70 raw Monid call cost vs. $149/month.`);
+    console.log(`This replaces first-pass evidence collection before downstream tool spend—not monitoring, remediation, contracts, or human review.\n`);
     return;
   }
 

@@ -22,10 +22,9 @@ retry is the final paid E2E. Do not spend again for this submission.
 Vendorapp's public Startup plan is **$149/month for 200 AI pre-screens**.
 Vendorapp Basic includes **15 AI pre-screens per month, always free**.
 
-`tool-audit` replaces one narrower workflow: collect live, before-spend vendor
-evidence without buying a seat first. It does not replace continuous
-monitoring, remediation, contracts, vendor lifecycle management, or human
-judgment.
+This replaces first-pass evidence collection before downstream tool spend—not
+monitoring, remediation, contracts, or human review. It is not a full
+Vendorapp replacement.
 
 The measured snapshot used three live Monid calls:
 
@@ -34,7 +33,9 @@ The measured snapshot used three live Monid calls:
 | Retrieve the incumbent's current public offer | `context.dev:/web/scrape/markdown` | $0.0009 |
 | Inspect target security headers | `api.strale.io:/x402/header-security-check` | $0.0594 |
 | Inspect target cookie/consent evidence | `api.strale.io:/x402/v2/cookie-scan` | $0.1782 |
-| **Measured total** | | **$0.2385** |
+| **Successful three-call chain** | | **$0.2385** |
+| Earlier failed/ambiguous attempt (`01M272SPTD953E3M0WVHF2WSN2`) | `context.dev:/web/scrape/markdown` | $0.0009 |
+| **Total measured campaign spend** | | **$0.2394** |
 
 200 repetitions at those measured rates would cost **$47.70**. Those
 repetitions are not equivalent to 200 Vendorapp AI pre-screens. Hosting and
@@ -125,7 +126,7 @@ node dist/cli.js audit api.strale.io:/x402/header-security-check
 
 This command makes three paid calls. It first checks the complete advertised
 per-call cost against a $0.24 ceiling. Do not re-run it for this submission;
-the measured $0.2385 snapshot is the final paid E2E.
+the measured $0.2385 chain is the final paid E2E. Campaign spend is $0.2394.
 
 ```bash
 node dist/cli.js prescreen https://monid.ai \

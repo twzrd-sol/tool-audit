@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>tool-audit — 1080p measured storyboard</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #0c0d10; color: #f4f1ea; }
+    body {
+      font: 22px/1.35 ui-sans-serif, system-ui, sans-serif;
+      overflow: hidden;
+    }
+    .stage {
+      width: 1920px;
+      height: 1080px;
+      position: relative;
+      background: #101114;
+    }
+    .bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 0 40px;
+      border-bottom: 1px solid #2b2e36;
+      letter-spacing: 0.08em;
+      font-size: 18px;
+    }
+    .bar span { color: #7d776c; }
+    .bar .on { color: #d7a04a; }
+    .scene {
+      position: absolute;
+      top: 72px; left: 0; right: 0; bottom: 110px;
+      padding: 48px 64px;
+      display: none;
+    }
+    .scene.show { display: block; }
+    .kicker { color: #d7a04a; letter-spacing: 0.14em; font-size: 16px; text-transform: uppercase; margin: 0 0 16px; }
+    h1 { font-size: 56px; line-height: 1.08; margin: 0 0 28px; font-weight: 700; }
+    h2 { font-size: 40px; margin: 0 0 20px; }
+    .nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 36px; }
+    .num { font-size: 64px; font-weight: 700; }
+    .muted { color: #b7b1a4; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .card, .term {
+      background: #1a1c21;
+      border: 1px solid #2b2e36;
+      border-radius: 14px;
+      padding: 22px 24px;
+    }
+    .amber { background: #2a2214; border-color: #d7a04a; }
+    dt { color: #b7b1a4; font-size: 15px; }
+    dd { margin: 0 0 12px; font-size: 24px; }
+    .term {
+      font: 20px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+      white-space: pre-wrap;
+      min-height: 620px;
+    }
+    .prompt { color: #d7a04a; }
+    .hit { color: #f4f1ea; }
+    .cap {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 110px;
+      padding: 18px 64px 22px;
+      background: #0b0c0f;
+      border-top: 1px solid #2b2e36;
+      font-size: 26px;
+      line-height: 1.3;
+    }
+    .cap em { color: #d7a04a; font-style: normal; }
+    .flow { display: flex; gap: 18px; margin: 28px 0; font-size: 28px; letter-spacing: 0.08em; }
+    .flow b { color: #d7a04a; }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="bar" id="bar">
+      <span id="s0">DISCOVER</span>
+      <span>→</span>
+      <span id="s1">INSPECT</span>
+      <span>→</span>
+      <span id="s2">RUN</span>
+      <span>→</span>
+      <span id="s3">REVIEW REQUIRED</span>
+    </div>
+
+    <section class="scene" id="sc0">
+      <p class="kicker">Measured storyboard · not a live query of the paid chain</p>
+      <h1>Vendorapp charges $149 a month for 200 AI pre-screens. We replaced its first-pass evidence check with three live Monid calls.</h1>
+      <div class="nums">
+        <div><div class="num">$149/mo</div><div class="muted">Vendorapp</div></div>
+        <div><div class="num">$0.2385</div><div class="muted">Monid chain</div></div>
+        <div><div class="num">$0.2394</div><div class="muted">Total experiment spend</div></div>
+      </div>
+    </section>
+
+    <section class="scene" id="sc1">
+      <p class="kicker">Scoped comparison</p>
+      <div class="cards">
+        <article class="card">
+          <h2>Vendorapp Startup</h2>
+          <p class="num">$149/month</p>
+          <p>200 AI pre-screens</p>
+        </article>
+        <article class="card">
+          <h2>tool-audit</h2>
+          <p class="num">$0.2385</p>
+          <p>3 live evidence calls</p>
+        </article>
+        <article class="card">
+          <h2>Campaign</h2>
+          <p class="num">$0.2394</p>
+          <p>includes $0.0009 earlier attempt</p>
+        </article>
+      </div>
+      <p class="muted" style="margin-top:28px;font-size:26px">Narrower workflow; not a full Vendorapp replacement</p>
+    </section>
+
+    <section class="scene" id="sc2">
+      <p class="kicker">Live Monid discover · free call · 2026-09-11</p>
+      <div class="term"><span class="prompt">$ monid discover -q "extract web page content" --limit 20 -j</span>
+count: 20
+required hit rank: 9
+<span class="hit">{
+  "provider": "context.dev",
+  "endpoint": "/web/scrape/markdown",
+  "price": { "type": "PER_CALL", "amount": { "value": 0.0009, "currency": "USD" } }
+}</span>
+
+discover → inspect → run</div>
+    </section>
+
+    <section class="scene" id="sc3">
+      <p class="kicker">Live Monid inspect · free call · PER_CALL / USD</p>
+      <div class="term"><span class="prompt">$ monid inspect --provider context.dev --endpoint /web/scrape/markdown -j</span>
+<span class="hit">{
+  "method": "GET",
+  "price": { "type": "PER_CALL", "amount": { "value": 0.0009, "currency": "USD" } },
+  "queryParams": ["url", "maxAgeMs", "useMainContentOnly", "timeoutMS", "..."]
+}</span>
+
+Bounded PER_CALL / USD. Advertised fee $0.0009. No spend yet.</div>
+    </section>
+
+    <section class="scene" id="sc4">
+      <p class="kicker">Paid run receipts · COMPLETED / HTTP 200 / USD</p>
+      <div class="cards">
+        <article class="card">
+          <dt>Purpose</dt><dd>Incumbent price</dd>
+          <dt>Provider</dt><dd>context.dev</dd>
+          <dt>Endpoint</dt><dd>/web/scrape/markdown</dd>
+          <dt>Run ID</dt><dd>XBQX3EW</dd>
+          <dt>Status</dt><dd>COMPLETED</dd>
+          <dt>Cost</dt><dd>$0.0009</dd>
+        </article>
+        <article class="card">
+          <dt>Purpose</dt><dd>Security headers</dd>
+          <dt>Provider</dt><dd>api.strale.io</dd>
+          <dt>Endpoint</dt><dd>/x402/header-security-check</dd>
+          <dt>Run ID</dt><dd>94MHXD</dd>
+          <dt>Status</dt><dd>COMPLETED</dd>
+          <dt>Cost</dt><dd>$0.0594</dd>
+        </article>
+        <article class="card amber">
+          <dt>Purpose</dt><dd>Cookie consent</dd>
+          <dt>Provider</dt><dd>api.strale.io</dd>
+          <dt>Endpoint</dt><dd>/x402/v2/cookie-scan</dd>
+          <dt>Run ID</dt><dd>0KESAJ</dd>
+          <dt>Status</dt><dd>COMPLETED</dd>
+          <dt>Cost</dt><dd>$0.1782</dd>
+        </article>
+      </div>
+      <p style="margin-top:22px">Successful chain <strong>$0.2385</strong> · earlier attempt <code>WSN2</code> <strong>$0.0009</strong> · experiment <strong>$0.2394</strong></p>
+    </section>
+
+    <section class="scene" id="sc5">
+      <p class="kicker">Cookie check</p>
+      <article class="card amber" style="max-width:1100px">
+        <h2>UNABLE_TO_VERIFY</h2>
+        <p>Partial HTML analyzed<br>JavaScript-set cookies not observed<br>Decision: REVIEW_REQUIRED</p>
+      </article>
+      <p class="muted" style="margin-top:28px">Six missing headers were observed. Absence of reported cookies is not approval.</p>
+    </section>
+
+    <section class="scene" id="sc6">
+      <p class="kicker">Spend boundary</p>
+      <div class="flow"><b>discover</b> → <b>inspect</b> → <b>run</b></div>
+      <h2>This replaces first-pass evidence collection before downstream tool spend—not monitoring, remediation, contracts, or human review.</h2>
+      <p class="muted">Monid evidence calls cost $0.2385 on the successful chain. They are not zero spend.</p>
+    </section>
+
+    <section class="scene" id="sc7">
+      <p class="kicker">#monid</p>
+      <h1>tool-audit</h1>
+      <p style="font-size:34px;margin:8px 0">Live demo: twzrd-sol.github.io/tool-audit</p>
+      <p style="font-size:34px;margin:8px 0">Source: github.com/twzrd-sol/tool-audit</p>
+      <p style="font-size:28px;margin-top:28px">3 live Monid calls · $0.2385 chain · $0.2394 experiment</p>
+    </section>
+
+    <div class="cap" id="cap"></div>
+  </div>
+  <script>
+    const scenes = [
+      { id: 'sc0', from: 0, to: 5, step: 0, cap: 'Vendorapp charges <em>$149</em> a month for 200 AI pre-screens.<br>We replaced its first-pass evidence check with three live Monid calls.' },
+      { id: 'sc1', from: 5, to: 8, step: 0, cap: 'Vendorapp: <em>$149/mo</em> · Monid chain: <em>$0.2385</em><br>Total experiment spend: <em>$0.2394</em> · not a full Vendorapp replacement' },
+      { id: 'sc2', from: 8, to: 16, step: 0, cap: 'Live Monid <em>discover</em> — extract web page content<br>context.dev /web/scrape/markdown · PER_CALL $0.0009' },
+      { id: 'sc3', from: 16, to: 22, step: 1, cap: 'Live Monid <em>inspect</em> — schema and USD price<br>GET · bounded PER_CALL · no spend yet' },
+      { id: 'sc4', from: 22, to: 32, step: 2, cap: 'Three <em>COMPLETED</em> / HTTP 200 runs<br>Successful chain <em>$0.2385</em> · experiment <em>$0.2394</em>' },
+      { id: 'sc5', from: 32, to: 43, step: 3, cap: 'Cookie check <em>UNABLE_TO_VERIFY</em><br>Decision: <em>REVIEW_REQUIRED</em>' },
+      { id: 'sc6', from: 43, to: 52, step: 3, cap: 'discover → inspect → run before an agent spends on the downstream tool.<br>Not monitoring, remediation, contracts, or human review.' },
+      { id: 'sc7', from: 52, to: 56, step: 3, cap: 'twzrd-sol.github.io/tool-audit<br>3 live Monid calls · <em>$0.2385</em> · <em>$0.2394</em> · #monid' }
+    ];
+    const start = performance.now();
+    function tick(now) {
+      const t = Math.min(55.99, (now - start) / 1000);
+      const scene = scenes.find(s => t >= s.from && t < s.to) || scenes[scenes.length - 1];
+      for (const s of scenes) document.getElementById(s.id).classList.toggle('show', s.id === scene.id);
+      document.getElementById('cap').innerHTML = scene.cap;
+      for (let i = 0; i < 4; i++) document.getElementById('s' + i).classList.toggle('on', i === scene.step);
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>

@@ -23,6 +23,12 @@ interface MeasuredSnapshot {
   label: string;
   verdict: string;
   measuredCostUsd: number;
+  campaignSpend: {
+    successfulChainUsd: number;
+    earlierAttemptUsd: number;
+    earlierAttemptRunId: string;
+    totalUsd: number;
+  };
   receiptSetSha256: string;
   receipts: SnapshotReceipt[];
   limitations: string[];
@@ -42,6 +48,14 @@ test('measured snapshot stays receipt-grade and uncertain', () => {
   assert.equal(evidence.verdict, 'review_required');
   assert.equal(evidence.receipts.length, 3);
   assert.equal(evidence.measuredCostUsd, 0.2385);
+  assert.equal(evidence.campaignSpend.successfulChainUsd, 0.2385);
+  assert.equal(evidence.campaignSpend.earlierAttemptUsd, 0.0009);
+  assert.equal(evidence.campaignSpend.totalUsd, 0.2394);
+  assert.equal(evidence.campaignSpend.earlierAttemptRunId, '01M272SPTD953E3M0WVHF2WSN2');
+  assert.equal(
+    Number((evidence.campaignSpend.successfulChainUsd + evidence.campaignSpend.earlierAttemptUsd).toFixed(4)),
+    0.2394
+  );
 
   const lines = evidence.receipts.map(receipt => {
     assert.equal(receipt.status, 'COMPLETED');
@@ -90,5 +104,7 @@ test('static pages are labeled as measured snapshots and keep cookie uncertainty
     assert.match(html, /extract web page content/);
     assert.match(html, /website security headers/);
     assert.match(html, /website cookie consent scan/);
+    assert.match(html, /\$0\.2394/);
+    assert.match(html, /downstream tool spend/);
   }
 });

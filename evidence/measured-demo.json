@@ -106,9 +106,16 @@
   "receiptDigestFormat": "runId|provider|endpoint|status|providerHttpStatus|costUsd|currency|completedAt joined with LF in receipt order",
   "receiptSetSha256": "b234eaf7045e12a292ab2a4350826afe6585a9bafaea5640663a85125a64617a",
   "measuredCostUsd": 0.2385,
+  "campaignSpend": {
+    "successfulChainUsd": 0.2385,
+    "earlierAttemptUsd": 0.0009,
+    "earlierAttemptRunId": "01M272SPTD953E3M0WVHF2WSN2",
+    "earlierAttemptNote": "Incumbent pricing run completed and billed $0.0009, but the first /run response omitted a usable cost receipt. The client refused before header or cookie calls. Later reconciled by runs get.",
+    "totalUsd": 0.2394
+  },
   "limitations": [
     "The cookie scan analyzed partial HTML and did not observe JavaScript-set cookies.",
-    "This replaces first-pass evidence collection, not monitoring, remediation, contracts, or human judgment."
+    "This replaces first-pass evidence collection before downstream tool spend—not monitoring, remediation, contracts, or human review."
   ],
   "snapshotUrl": "https://twzrd-sol.github.io/tool-audit/",
   "sourceUrl": "https://github.com/twzrd-sol/tool-audit"

@@ -56,6 +56,19 @@ const total = Number(
 if (total !== evidence.measuredCostUsd || total !== 0.2385) {
   throw new Error(`Snapshot total ${total} is not the measured $0.2385.`);
 }
+const campaign = evidence.campaignSpend || {};
+const campaignTotal = Number(
+  (Number(campaign.successfulChainUsd) + Number(campaign.earlierAttemptUsd)).toFixed(4)
+);
+if (
+  campaign.successfulChainUsd !== 0.2385 ||
+  campaign.earlierAttemptUsd !== 0.0009 ||
+  campaign.totalUsd !== 0.2394 ||
+  campaignTotal !== 0.2394 ||
+  campaign.earlierAttemptRunId !== '01M272SPTD953E3M0WVHF2WSN2'
+) {
+  throw new Error('Campaign spend must be $0.2385 + $0.0009 = $0.2394 with the reconciled earlier run.');
+}
 
 const cookie = evidence.receipts.find(receipt => receipt.purpose === 'cookie_consent');
 const cookieText = JSON.stringify(cookie?.outputSummary || {});
@@ -71,6 +84,7 @@ console.log(JSON.stringify({
   kind: evidence.kind,
   receiptsVerified: evidence.receipts.length,
   measuredCostUsd: total,
+  campaignSpendUsd: campaign.totalUsd,
   receiptSetSha256: digest,
   verdict: evidence.verdict
 }, null, 2));
