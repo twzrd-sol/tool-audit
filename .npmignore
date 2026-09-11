@@ -1,0 +1,6 @@
+.env*
+POST_COPY.md
+VIDEO_SCRIPT.md
+src/
+dist/*.test.js
+dist/*.test.d.ts

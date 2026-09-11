@@ -53,14 +53,35 @@ function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' ? value as Record<string, unknown> : {};
 }
 
+function requireCredentialFreeHttpsUrl(value: string, label: string): URL {
+  const parsed = new URL(value);
+  if (parsed.protocol !== 'https:') {
+    throw new PrescreenRefusalError(`${label} must use HTTPS.`);
+  }
+  if (parsed.username || parsed.password) {
+    throw new PrescreenRefusalError(`${label} must not contain embedded credentials.`);
+  }
+  return parsed;
+}
+
 function assertSuccessfulRun(run: MonidRun, purpose: string): void {
-  const providerStatus = run.providerResponse?.httpStatus ?? 200;
-  if (run.status !== 'COMPLETED' || providerStatus < 200 || providerStatus >= 300) {
+  const providerStatus = run.providerResponse?.httpStatus;
+  if (
+    run.status !== 'COMPLETED' ||
+    !Number.isInteger(providerStatus) ||
+    (providerStatus ?? 0) < 200 ||
+    (providerStatus ?? 0) >= 300
+  ) {
     throw new PrescreenRefusalError(
-      `${purpose} run ${run.runId} ended with ${run.status} / HTTP ${providerStatus}.`
+      `${purpose} run ${run.runId} ended with ${run.status} / HTTP ${String(providerStatus)}.`
     );
   }
-  if (!run.cost || !Number.isFinite(run.cost.value) || run.cost.value < 0) {
+  if (
+    !run.cost ||
+    run.cost.currency !== 'USD' ||
+    !Number.isFinite(run.cost.value) ||
+    run.cost.value < 0
+  ) {
     throw new PrescreenRefusalError(`${purpose} run ${run.runId} omitted a usable cost receipt.`);
   }
 }
@@ -73,7 +94,8 @@ function receipt(purpose: RequiredTool['purpose'], run: MonidRun): PrescreenRunR
     endpoint: run.endpoint,
     status: run.status,
     costUsd: run.cost?.value ?? 0,
-    providerHttpStatus: run.providerResponse?.httpStatus
+    currency: 'USD',
+    providerHttpStatus: run.providerResponse!.httpStatus!
   };
 }
 
@@ -94,6 +116,16 @@ async function discoverInspectAndAuditRequiredTools(
     const endpoint = await client.inspect(required.id);
     if (!endpoint) {
       throw new PrescreenRefusalError(`Required endpoint ${required.id} could not be inspected.`);
+    }
+    if (endpoint.id !== required.id) {
+      throw new PrescreenRefusalError(
+        `Inspect identity mismatch: requested ${required.id}, received ${endpoint.id}.`
+      );
+    }
+    if (endpoint.pricing.model !== 'per-call' || endpoint.pricing.currency !== 'USD') {
+      throw new PrescreenRefusalError(
+        `Required endpoint ${required.id} must remain bounded PER_CALL/USD pricing.`
+      );
     }
     const verdict = auditor.audit(endpoint);
     if (verdict.status === 'BLOCKED') {
@@ -132,16 +164,14 @@ export async function runVendorPrescreen(
     throw new PrescreenRefusalError('Paid vendor pre-screen requires confirmSpend: true.');
   }
 
-  const parsedTarget = new URL(targetUrl);
-  if (parsedTarget.protocol !== 'https:') {
-    throw new PrescreenRefusalError('Vendor pre-screen targets must use HTTPS.');
-  }
-
+  const parsedTarget = requireCredentialFreeHttpsUrl(targetUrl, 'Vendor pre-screen target');
   const incumbentPricingUrl = options.incumbentPricingUrl || 'https://vendorapp.co/pricing';
-  const parsedPricingUrl = new URL(incumbentPricingUrl);
-  if (parsedPricingUrl.protocol !== 'https:') {
-    throw new PrescreenRefusalError('Incumbent pricing evidence must use HTTPS.');
-  }
+  const parsedPricingUrl = requireCredentialFreeHttpsUrl(
+    incumbentPricingUrl,
+    'Incumbent pricing evidence'
+  );
+  const normalizedTargetUrl = parsedTarget.toString();
+  const normalizedPricingUrl = parsedPricingUrl.toString();
 
   const maxTotalUsd = options.maxTotalUsd ?? 0.24;
   if (!Number.isFinite(maxTotalUsd) || maxTotalUsd <= 0) {
@@ -159,7 +189,7 @@ export async function runVendorPrescreen(
   );
   if (!Number.isFinite(advertisedTotal) || advertisedTotal > maxTotalUsd) {
     throw new PrescreenRefusalError(
-      `Advertised Monid cost $${advertisedTotal.toFixed(4)} exceeds the $${maxTotalUsd.toFixed(4)} run ceiling.`
+      `Advertised Monid cost $${advertisedTotal.toFixed(4)} exceeds the $${maxTotalUsd.toFixed(4)} advertised-price ceiling.`
     );
   }
 
@@ -167,11 +197,11 @@ export async function runVendorPrescreen(
     endpoints.get('incumbent_price')!.id,
     {
       queryParams: {
-        url: incumbentPricingUrl,
+        url: normalizedPricingUrl,
         includeLinks: false,
         includeImages: false,
         useMainContentOnly: true,
-        maxAge: 0
+        maxAgeMs: 0
       }
     }
   );
@@ -190,13 +220,13 @@ export async function runVendorPrescreen(
 
   const headerRun = await client.run(
     endpoints.get('security_headers')!.id,
-    { queryParams: { url: targetUrl } }
+    { queryParams: { url: normalizedTargetUrl } }
   );
   assertSuccessfulRun(headerRun, 'Security header');
 
   const cookieRun = await client.run(
     endpoints.get('cookie_consent')!.id,
-    { queryParams: { url: targetUrl } }
+    { queryParams: { url: normalizedTargetUrl } }
   );
   assertSuccessfulRun(cookieRun, 'Cookie consent');
 
@@ -205,9 +235,15 @@ export async function runVendorPrescreen(
   const missingSecurityHeaders = Array.isArray(headerOutput.missing)
     ? headerOutput.missing
     : [];
-  const cookiePotentialIssues = Array.isArray(cookieOutput.potential_issues)
+  const headerPotentialIssues = Array.isArray(headerOutput.missing)
+    ? []
+    : ['Security-header result omitted its missing-header evidence.'];
+  const parsedCookieIssues = Array.isArray(cookieOutput.potential_issues)
     ? cookieOutput.potential_issues.filter((item): item is string => typeof item === 'string')
-    : ['Cookie scan omitted its potential_issues field.'];
+    : [];
+  const cookiePotentialIssues = parsedCookieIssues.length > 0
+    ? parsedCookieIssues
+    : ['Cookie scan returned no limitation details; absence of reported issues is not approval.'];
   const receipts = [
     receipt('incumbent_price', priceRun),
     receipt('security_headers', headerRun),
@@ -219,10 +255,10 @@ export async function runVendorPrescreen(
 
   return {
     schema: 'tool-audit.vendor-prescreen.v1',
-    targetUrl,
+    targetUrl: normalizedTargetUrl,
     incumbent: {
       name: 'Vendorapp Startup',
-      pricingUrl: incumbentPricingUrl,
+      pricingUrl: normalizedPricingUrl,
       monthlyPriceUsd: 149,
       includedPrescreens: 200,
       freeTierPrescreens: 15,
@@ -231,6 +267,7 @@ export async function runVendorPrescreen(
     verdict: 'review_required',
     findings: {
       missingSecurityHeaders,
+      headerPotentialIssues,
       cookiePotentialIssues
     },
     receipts,

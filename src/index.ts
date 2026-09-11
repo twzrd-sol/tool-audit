@@ -101,14 +101,24 @@ export async function executeWithAudit(
   try {
     const client = new MonidClient(options.monidApiKey);
     const execution = await client.run(audited.tool.id, executionParams);
-    const providerStatus = execution.providerResponse?.httpStatus ?? 200;
-    if (execution.status !== 'COMPLETED' || providerStatus >= 400) {
+    const providerStatus = execution.providerResponse?.httpStatus;
+    const usableCost =
+      execution.cost?.currency === 'USD' &&
+      Number.isFinite(execution.cost.value) &&
+      execution.cost.value >= 0;
+    if (
+      execution.status !== 'COMPLETED' ||
+      !Number.isInteger(providerStatus) ||
+      (providerStatus ?? 0) < 200 ||
+      (providerStatus ?? 0) >= 300 ||
+      !usableCost
+    ) {
       return {
         step: 'REFUSED',
         tool: audited.tool,
         verdict: audited.verdict,
         execution,
-        refusalReason: `Monid run ${execution.runId} ended with ${execution.status} / HTTP ${providerStatus}.`
+        refusalReason: `Monid run ${execution.runId} lacked a successful 2xx USD receipt (${execution.status} / HTTP ${String(providerStatus)}).`
       };
     }
     return {

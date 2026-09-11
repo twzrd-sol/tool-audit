@@ -1,5 +1,5 @@
 {
-  "schema": "tool-audit.measured-demo.v1",
+  "schema": "tool-audit.measured-demo.v2",
   "measuredAt": "2026-09-11T01:02:11.304Z",
   "targetUrl": "https://monid.ai",
   "incumbent": {
@@ -16,26 +16,98 @@
       "runId": "01M26ZQCF2RTDKB9WQ5XBQX3EW",
       "provider": "context.dev",
       "endpoint": "/web/scrape/markdown",
-      "costUsd": 0.0009
+      "status": "COMPLETED",
+      "providerHttpStatus": 200,
+      "costUsd": 0.0009,
+      "currency": "USD",
+      "completedAt": "2026-09-11T01:01:21.583Z",
+      "input": {
+        "queryParams": {
+          "url": "https://vendorapp.co/pricing",
+          "includeLinks": false,
+          "includeImages": false,
+          "useMainContentOnly": true,
+          "maxAgeMs": 0,
+          "timeoutMS": 30000
+        }
+      },
+      "outputSummary": {
+        "success": true,
+        "finalUrl": "https://vendorapp.co/pricing/",
+        "title": "Pricing | Simple Plans, Free to Expert | Vendorapp",
+        "cacheStatus": "miss",
+        "startupPriceVerified": true,
+        "includedPrescreensVerified": true,
+        "freeTierVerified": true
+      }
     },
     {
       "purpose": "security_headers",
       "runId": "01M26ZRF377CFWF9SAQF94MHXD",
       "provider": "api.strale.io",
       "endpoint": "/x402/header-security-check",
-      "costUsd": 0.0594
+      "status": "COMPLETED",
+      "providerHttpStatus": 200,
+      "costUsd": 0.0594,
+      "currency": "USD",
+      "completedAt": "2026-09-11T01:01:55.732Z",
+      "input": {
+        "queryParams": {
+          "url": "https://monid.ai"
+        }
+      },
+      "outputSummary": {
+        "score": 10,
+        "grade": "F",
+        "missingHeaders": [
+          "strict-transport-security",
+          "content-security-policy",
+          "x-frame-options",
+          "x-content-type-options",
+          "referrer-policy",
+          "permissions-policy"
+        ],
+        "fetchedAt": "2026-09-11T01:01:54.491Z",
+        "settlementId": "0x3060a57c66e157c3e2ca0e85720f86b9e62ae5acb9128dbaba070469f7c48a87"
+      }
     },
     {
       "purpose": "cookie_consent",
       "runId": "01M26ZRWB37QR0XZ72ED0KESAJ",
       "provider": "api.strale.io",
       "endpoint": "/x402/v2/cookie-scan",
-      "costUsd": 0.1782
+      "status": "COMPLETED",
+      "providerHttpStatus": 200,
+      "costUsd": 0.1782,
+      "currency": "USD",
+      "completedAt": "2026-09-11T01:02:11.304Z",
+      "input": {
+        "queryParams": {
+          "url": "https://monid.ai"
+        }
+      },
+      "outputSummary": {
+        "totalCookiesObserved": 0,
+        "consentBannerDetected": false,
+        "potentialIssues": [
+          "No cookie consent banner detected",
+          "No tracking scripts identified in provided HTML snippet",
+          "Incomplete HTML analysis - only first 5000 chars of source provided, full assessment requires complete page source",
+          "Unable to verify if cookies are set via JavaScript after page load",
+          "Cannot confirm absence of third-party tracking without full source inspection"
+        ],
+        "fetchedAt": "2026-09-11T01:02:10.153Z",
+        "settlementId": "0xb507f29947c6f58efd7e41a9a8f74abdb535efcc724310bdefe236f2c2717955"
+      }
     }
   ],
+  "receiptDigestFormat": "runId|provider|endpoint|status|providerHttpStatus|costUsd|currency|completedAt joined with LF in receipt order",
+  "receiptSetSha256": "b234eaf7045e12a292ab2a4350826afe6585a9bafaea5640663a85125a64617a",
   "measuredCostUsd": 0.2385,
   "limitations": [
     "The cookie scan analyzed partial HTML and did not observe JavaScript-set cookies.",
     "This replaces first-pass evidence collection, not monitoring, remediation, contracts, or human judgment."
-  ]
+  ],
+  "liveDemoUrl": "https://twzrd-sol.github.io/tool-audit/",
+  "sourceUrl": "https://github.com/twzrd-sol/tool-audit"
 }

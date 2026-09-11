@@ -92,7 +92,7 @@ async function main() {
     const targetUrl = args[1] || 'https://monid.ai';
     const maxIndex = args.indexOf('--max-total');
     const maxTotalUsd = maxIndex >= 0 ? Number(args[maxIndex + 1]) : 0.24;
-    console.log(`🔎 Pre-screening ${targetUrl} with a $${maxTotalUsd.toFixed(4)} total ceiling...`);
+    console.log(`🔎 Pre-screening ${targetUrl} with a $${maxTotalUsd.toFixed(4)} advertised-price ceiling...`);
     const report = await runVendorPrescreen(targetUrl, {
       confirmSpend: true,
       maxTotalUsd

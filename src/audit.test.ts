@@ -15,6 +15,7 @@ test('ToolAuditor: approves secure, bounded endpoints', () => {
     pricing: {
       model: 'per-call',
       rawType: 'PER_CALL',
+      currency: 'USD',
       baseFeeUsd: 0.005
     },
     inputSchema: {
@@ -45,6 +46,7 @@ test('ToolAuditor: blocks insecure plaintext HTTP endpoints', () => {
     pricing: {
       model: 'per-call',
       rawType: 'PER_CALL',
+      currency: 'USD',
       baseFeeUsd: 0.005
     },
     inputSchema: {
@@ -71,6 +73,7 @@ test('ToolAuditor: flags credentials in URL query parameters', () => {
     pricing: {
       model: 'per-call',
       rawType: 'PER_CALL',
+      currency: 'USD',
       baseFeeUsd: 0.005
     },
     inputSchema: {
@@ -96,6 +99,7 @@ test('ToolAuditor: blocks spend ceiling breaches', () => {
     pricing: {
       model: 'per-call',
       rawType: 'PER_CALL',
+      currency: 'USD',
       baseFeeUsd: 2.00
     },
     inputSchema: {
@@ -121,6 +125,7 @@ test('ToolAuditor: flags unbounded per-result billing multipliers', () => {
     pricing: {
       model: 'per-result',
       rawType: 'PER_RESULT',
+      currency: 'USD',
       baseFeeUsd: 0.01,
       unitFeeUsd: 0.02
     },
@@ -132,4 +137,109 @@ test('ToolAuditor: flags unbounded per-result billing multipliers', () => {
 
   const verdict = auditor.audit(unboundedTool);
   assert.ok(verdict.findings.some(f => f.code === 'UNBOUNDED_RESULT_BILLING'));
+});
+
+test('ToolAuditor: blocks unsupported methods and non-HTTPS transports', () => {
+  const auditor = new ToolAuditor();
+  const verdict = auditor.audit({
+    id: 'test:/ftp',
+    name: 'Invalid Contract',
+    provider: 'test',
+    description: '',
+    url: 'ftp://example.com/data',
+    method: 'PATCH' as MonidEndpoint['method'],
+    pricing: {
+      model: 'per-call',
+      rawType: 'PER_CALL',
+      currency: 'USD',
+      baseFeeUsd: 0.01
+    },
+    inputSchema: {
+      type: 'object',
+      properties: { query: { type: 'string' } }
+    }
+  });
+
+  assert.equal(verdict.status, 'BLOCKED');
+  assert.ok(verdict.findings.some(f => f.code === 'UNSUPPORTED_HTTP_METHOD'));
+  assert.ok(verdict.findings.some(f => f.code === 'INSECURE_TRANSPORT'));
+});
+
+test('ToolAuditor: blocks negative per-result prices', () => {
+  const auditor = new ToolAuditor();
+  const verdict = auditor.audit({
+    id: 'test:/negative',
+    name: 'Negative Unit Fee',
+    provider: 'test',
+    description: '',
+    url: 'https://example.com/data',
+    method: 'GET',
+    pricing: {
+      model: 'per-result',
+      rawType: 'PER_RESULT',
+      currency: 'USD',
+      baseFeeUsd: 0.01,
+      unitFeeUsd: -1
+    },
+    inputSchema: {
+      type: 'object',
+      properties: { limit: { type: 'integer', maximum: 10 } }
+    }
+  });
+
+  assert.equal(verdict.status, 'BLOCKED');
+  assert.ok(verdict.findings.some(f => f.code === 'INVALID_UNIT_FEE'));
+  assert.ok(verdict.maxEstimatedCostUsd >= 0);
+});
+
+test('ToolAuditor: includes bounded per-result units in the ceiling', () => {
+  const auditor = new ToolAuditor({ maxPricePerCallUsd: 0.24 });
+  const verdict = auditor.audit({
+    id: 'test:/bounded',
+    name: 'Bounded but Expensive',
+    provider: 'test',
+    description: '',
+    url: 'https://example.com/data',
+    method: 'GET',
+    pricing: {
+      model: 'per-result',
+      rawType: 'PER_RESULT',
+      currency: 'USD',
+      baseFeeUsd: 0,
+      unitFeeUsd: 0.30
+    },
+    inputSchema: {
+      type: 'object',
+      properties: { maxItems: { type: 'integer', maximum: 10 } }
+    }
+  });
+
+  assert.equal(verdict.maxEstimatedCostUsd, 3);
+  assert.equal(verdict.status, 'BLOCKED');
+  assert.ok(verdict.findings.some(f => f.code === 'PRICE_CEILING_BREACH'));
+});
+
+test('ToolAuditor: blocks prices outside USD', () => {
+  const auditor = new ToolAuditor();
+  const verdict = auditor.audit({
+    id: 'test:/eur',
+    name: 'Euro Price',
+    provider: 'test',
+    description: '',
+    url: 'https://example.com/data',
+    method: 'GET',
+    pricing: {
+      model: 'per-call',
+      rawType: 'PER_CALL',
+      currency: 'EUR',
+      baseFeeUsd: 0.01
+    },
+    inputSchema: {
+      type: 'object',
+      properties: { query: { type: 'string' } }
+    }
+  });
+
+  assert.equal(verdict.status, 'BLOCKED');
+  assert.ok(verdict.findings.some(f => f.code === 'UNSUPPORTED_CURRENCY'));
 });

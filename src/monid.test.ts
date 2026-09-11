@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  MonidAmbiguousRunError,
   MonidApiError,
   MonidClient,
   MonidConfigurationError
@@ -150,4 +151,118 @@ test('MonidClient polls asynchronous runs to a terminal receipt', async () => {
   assert.equal(run.status, 'COMPLETED');
   assert.equal(run.cost?.value, 0.0009);
   assert.equal(polls, 1);
+});
+
+test('MonidClient reconciles a synchronous completion that omits settled cost', async () => {
+  let reconciliations = 0;
+  const fakeFetch = (async (input: string | URL | Request) => {
+    const url = String(input);
+    if (url.endsWith('/run')) {
+      return jsonResponse({
+        runId: '01SYNC',
+        provider: 'context.dev',
+        endpoint: '/web/scrape/markdown',
+        status: 'COMPLETED',
+        providerResponse: { httpStatus: 200 },
+        output: { markdown: 'live' }
+      });
+    }
+    reconciliations += 1;
+    return jsonResponse({
+      runId: '01SYNC',
+      provider: 'context.dev',
+      endpoint: '/web/scrape/markdown',
+      status: 'COMPLETED',
+      providerResponse: { httpStatus: 200 },
+      output: { markdown: 'live' },
+      cost: { value: 0.0009, currency: 'USD' }
+    });
+  }) as typeof fetch;
+
+  const client = new MonidClient('monid_live_test', 'https://api.monid.test/v1', fakeFetch);
+  const run = await client.run(
+    'context.dev:/web/scrape/markdown',
+    { queryParams: { url: 'https://example.com' } },
+    { pollMs: 1 }
+  );
+
+  assert.equal(run.status, 'COMPLETED');
+  assert.equal(run.cost?.value, 0.0009);
+  assert.equal(reconciliations, 1);
+});
+
+test('MonidClient preserves completed provider errors for caller policy', async () => {
+  const client = new MonidClient(
+    'monid_live_test',
+    'https://api.monid.test/v1',
+    (async () => jsonResponse({
+      runId: '01NOTFOUND',
+      provider: 'example',
+      endpoint: '/lookup',
+      status: 'COMPLETED',
+      providerResponse: { httpStatus: 404, error: { message: 'not found' } },
+      output: null,
+      cost: { value: 0, currency: 'USD' }
+    }, 404)) as typeof fetch
+  );
+
+  const run = await client.run(
+    'example:/lookup',
+    { queryParams: { id: 'missing' } },
+    { wait: false }
+  );
+
+  assert.equal(run.status, 'COMPLETED');
+  assert.equal(run.providerResponse?.httpStatus, 404);
+  assert.equal(run.cost?.value, 0);
+});
+
+test('MonidClient bounds a paid request without retrying it', async () => {
+  let calls = 0;
+  const fakeFetch = ((_input: string | URL | Request, init?: RequestInit) => {
+    calls += 1;
+    return new Promise<Response>((_resolve, reject) => {
+      init?.signal?.addEventListener('abort', () => {
+        reject(new DOMException('aborted', 'AbortError'));
+      });
+    });
+  }) as typeof fetch;
+  const client = new MonidClient('monid_live_test', 'https://api.monid.test/v1', fakeFetch);
+
+  await assert.rejects(
+    client.run(
+      'example:/slow',
+      {},
+      { requestTimeoutMs: 1, wait: false }
+    ),
+    (error: unknown) =>
+      error instanceof MonidAmbiguousRunError &&
+      /Do not retry blindly/.test(error.message)
+  );
+  assert.equal(calls, 1);
+});
+
+test('MonidClient rejects a confused run identity', async () => {
+  const client = new MonidClient(
+    'monid_live_test',
+    'https://api.monid.test/v1',
+    (async () => jsonResponse({
+      runId: '01WRONG',
+      provider: 'other-provider',
+      endpoint: '/other-endpoint',
+      status: 'COMPLETED',
+      cost: { value: 0.01, currency: 'USD' }
+    })) as typeof fetch
+  );
+
+  await assert.rejects(
+    client.run(
+      'expected:/endpoint',
+      {},
+      { wait: false }
+    ),
+    (error: unknown) =>
+      error instanceof MonidApiError &&
+      /returned identity/.test(error.message)
+  );
 });

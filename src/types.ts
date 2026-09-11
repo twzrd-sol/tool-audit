@@ -1,6 +1,7 @@
 export interface MonidPricing {
   model: 'per-call' | 'per-result' | 'unsupported';
   rawType: string;
+  currency: string;
   baseFeeUsd: number;
   unitFeeUsd?: number;
   notes?: string[];
@@ -20,6 +21,8 @@ export interface MonidEndpoint {
       description?: string;
       default?: unknown;
       enum?: unknown[];
+      minimum?: number;
+      maximum?: number;
     }>;
     required?: string[];
   };
@@ -96,14 +99,6 @@ export interface AuditVerdict {
   pricing: MonidPricing;
   maxEstimatedCostUsd: number;
   findings: AuditFinding[];
-  vendorRiskReplaced: {
-    incumbentProcess: string;
-    incumbentTurnaround: string;
-    incumbentCost: string;
-    toolAuditTurnaround: string;
-    toolAuditCost: string;
-    comparisonNote: string;
-  };
   timestamp: string;
   auditHash: string;
 }
@@ -115,7 +110,8 @@ export interface PrescreenRunReceipt {
   endpoint: string;
   status: MonidRunStatus;
   costUsd: number;
-  providerHttpStatus?: number;
+  currency: 'USD';
+  providerHttpStatus: number;
 }
 
 export interface VendorPrescreenReport {
@@ -132,6 +128,7 @@ export interface VendorPrescreenReport {
   verdict: 'review_required' | 'unable_to_verify';
   findings: {
     missingSecurityHeaders: unknown[];
+    headerPotentialIssues: string[];
     cookiePotentialIssues: string[];
   };
   receipts: PrescreenRunReceipt[];

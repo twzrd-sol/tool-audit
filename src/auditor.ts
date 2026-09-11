@@ -19,15 +19,28 @@ export class ToolAuditor {
   public audit(tool: MonidEndpoint): AuditVerdict {
     const findings: AuditFinding[] = [];
     let penaltyScore = 0;
+    const supportedMethods = new Set(['GET', 'POST', 'PUT', 'DELETE']);
+
+    if (!supportedMethods.has(String(tool.method))) {
+      findings.push({
+        code: 'UNSUPPORTED_HTTP_METHOD',
+        severity: 'CRITICAL',
+        category: 'CONTRACT_HONESTY',
+        title: `Unsupported HTTP Method '${String(tool.method)}'`,
+        description: 'The endpoint method is outside the audited contract surface.',
+        recommendation: 'Refuse execution until the method is explicitly supported and tested.'
+      });
+      penaltyScore += 50;
+    }
 
     // Check 1: Transport Security (HTTPS vs Plaintext HTTP)
-    if (tool.url.startsWith('http://')) {
+    if (this.policy.requireHttps && !tool.url.startsWith('https://')) {
       findings.push({
         code: 'INSECURE_TRANSPORT',
         severity: 'CRITICAL',
         category: 'TRANSPORT_SECURITY',
-        title: 'Plaintext HTTP Endpoint',
-        description: `Endpoint ${tool.url} communicates over unencrypted HTTP, exposing agent traffic and tokens to MITM inspection.`,
+        title: 'Non-HTTPS Endpoint',
+        description: `Endpoint ${tool.url} is not HTTPS, so transport confidentiality and integrity are not established.`,
         recommendation: 'Refuse execution until the provider migrates to HTTPS (TLS 1.3 preferred).'
       });
       penaltyScore += 50;
@@ -37,7 +50,10 @@ export class ToolAuditor {
     const sensitiveQueryParams = ['key', 'token', 'secret', 'auth', 'password', 'bearer', 'apikey', 'api_key'];
     const urlLower = tool.url.toLowerCase();
     for (const param of sensitiveQueryParams) {
-      if (urlLower.includes(`?${param}=`) || urlLower.includes(`&${param}=`)) {
+      if (
+        this.policy.disallowQueryAuth &&
+        (urlLower.includes(`?${param}=`) || urlLower.includes(`&${param}=`))
+      ) {
         findings.push({
           code: 'QUERY_AUTH_LEAKAGE',
           severity: 'HIGH',
@@ -55,7 +71,11 @@ export class ToolAuditor {
     if (tool.inputSchema?.properties) {
       for (const [propName, propDef] of Object.entries(tool.inputSchema.properties)) {
         const propLower = propName.toLowerCase();
-        if (sensitiveQueryParams.includes(propLower) && tool.method === 'GET') {
+        if (
+          this.policy.disallowQueryAuth &&
+          sensitiveQueryParams.includes(propLower) &&
+          tool.method === 'GET'
+        ) {
           findings.push({
             code: 'QUERY_CREDENTIAL_FIELD',
             severity: 'HIGH',
@@ -70,11 +90,13 @@ export class ToolAuditor {
     }
 
     // Check 3: Economic Safety & Unbounded Multiplication
-    let estimatedCost = tool.pricing.baseFeeUsd;
+    const validBaseFee =
+      Number.isFinite(tool.pricing.baseFeeUsd) &&
+      tool.pricing.baseFeeUsd >= 0;
+    let estimatedCost = validBaseFee ? tool.pricing.baseFeeUsd : 0;
     if (
       tool.pricing.model === 'unsupported' ||
-      !Number.isFinite(tool.pricing.baseFeeUsd) ||
-      tool.pricing.baseFeeUsd < 0
+      !validBaseFee
     ) {
       findings.push({
         code: 'UNSUPPORTED_PRICING_MODEL',
@@ -87,53 +109,91 @@ export class ToolAuditor {
       penaltyScore += 50;
     }
 
-    if (tool.pricing.model === 'per-result') {
-      const hasLimitProp = Boolean(
-        tool.inputSchema?.properties?.limit ||
-        tool.inputSchema?.properties?.max_results ||
-        tool.inputSchema?.properties?.count
-      );
+    if (tool.pricing.currency !== 'USD') {
+      findings.push({
+        code: 'UNSUPPORTED_CURRENCY',
+        severity: 'CRITICAL',
+        category: 'ECONOMIC_SAFETY',
+        title: `Unsupported Currency '${tool.pricing.currency}'`,
+        description: 'The local USD ceiling cannot safely compare a price denominated in another or missing currency.',
+        recommendation: 'Refuse execution or convert through an explicitly trusted, freshness-bounded exchange rate.'
+      });
+      penaltyScore += 50;
+    }
 
-      if (!hasLimitProp) {
+    if (tool.pricing.model === 'per-result') {
+      const unitFee = tool.pricing.unitFeeUsd;
+      const validUnitFee = Number.isFinite(unitFee) && (unitFee ?? -1) >= 0;
+      if (!validUnitFee) {
+        findings.push({
+          code: 'INVALID_UNIT_FEE',
+          severity: 'CRITICAL',
+          category: 'ECONOMIC_SAFETY',
+          title: 'Invalid Per-Result Unit Fee',
+          description: `Per-result pricing supplied an invalid unit fee: ${String(unitFee)}.`,
+          recommendation: 'Refuse execution until a finite, non-negative unit fee is inspected.'
+        });
+        penaltyScore += 50;
+      }
+
+      const limitNames = [
+        'limit',
+        'max_results',
+        'maxResults',
+        'maxItems',
+        'resultsLimit',
+        'count'
+      ];
+      const hardLimits = limitNames
+        .map(name => tool.inputSchema?.properties?.[name]?.maximum)
+        .filter((maximum): maximum is number =>
+          Number.isFinite(maximum) && (maximum ?? 0) >= 0
+        );
+
+      if (hardLimits.length === 0 && this.policy.disallowUnboundedResults) {
         findings.push({
           code: 'UNBOUNDED_RESULT_BILLING',
-          severity: 'HIGH',
+          severity: 'CRITICAL',
           category: 'ECONOMIC_SAFETY',
           title: 'Unbounded Per-Result Multiplier',
-          description: `Pricing model is 'per-result' ($${tool.pricing.unitFeeUsd}/item), but the schema does not enforce a maximum result cap ('limit' or 'max_results'). A runaway query could drain the agent wallet.`,
-          recommendation: 'Enforce client-side limit parameter or mandate hard budget ceilings in execution wrapper.'
+          description: `Pricing is per-result, but no recognized result parameter has a finite JSON Schema maximum.`,
+          recommendation: 'Require a server-validated hard maximum before estimating or authorizing spend.'
         });
-        penaltyScore += 25;
-        estimatedCost += (tool.pricing.unitFeeUsd ?? 0.01) * 100; // project 100 results risk
-      } else {
-        estimatedCost += (tool.pricing.unitFeeUsd ?? 0.01) * 10; // project standard 10 results
+        penaltyScore += 50;
+      } else if (validUnitFee) {
+        estimatedCost += unitFee * Math.max(...hardLimits);
       }
     }
 
     // Check 4: Price Ceiling Policy Breach
-    if (tool.pricing.baseFeeUsd > this.policy.maxPricePerCallUsd) {
+    if (estimatedCost > this.policy.maxPricePerCallUsd) {
       findings.push({
         code: 'PRICE_CEILING_BREACH',
         severity: 'CRITICAL',
         category: 'ECONOMIC_SAFETY',
-        title: `Base Fee ($${tool.pricing.baseFeeUsd}) Exceeds Spend Ceiling ($${this.policy.maxPricePerCallUsd})`,
-        description: `Tool base execution cost of $${tool.pricing.baseFeeUsd} exceeds the pre-approved organizational threshold of $${this.policy.maxPricePerCallUsd}.`,
+        title: `Worst-Case Cost ($${estimatedCost}) Exceeds Spend Ceiling ($${this.policy.maxPricePerCallUsd})`,
+        description: `The bounded worst-case execution cost exceeds the pre-approved organizational threshold.`,
         recommendation: 'Requires operator override or budget policy elevation before execution.'
       });
       penaltyScore += 40;
     }
 
     // Check 5: Contract Honesty & Schema Discipline
-    if (!tool.inputSchema || !tool.inputSchema.properties || Object.keys(tool.inputSchema.properties).length === 0) {
+    if (
+      this.policy.enforceTypedSchema &&
+      (!tool.inputSchema ||
+        !tool.inputSchema.properties ||
+        Object.keys(tool.inputSchema.properties).length === 0)
+    ) {
       findings.push({
         code: 'EMPTY_INPUT_SCHEMA',
-        severity: 'MEDIUM',
+        severity: 'CRITICAL',
         category: 'CONTRACT_HONESTY',
         title: 'Unspecified Input Schema',
         description: 'Endpoint accepts unstructured inputs without parameter validation, risking runtime failures or hallucinated argument parsing.',
         recommendation: 'Demand structured JSON schema with explicit types and required property definitions.'
       });
-      penaltyScore += 15;
+      penaltyScore += 50;
     }
 
     // Check 6: Data Egress & Sensitive PII Targets
@@ -182,14 +242,6 @@ export class ToolAuditor {
       pricing: tool.pricing,
       maxEstimatedCostUsd: Number(estimatedCost.toFixed(4)),
       findings,
-      vendorRiskReplaced: {
-        incumbentProcess: 'Vendorapp Startup first-pass vendor pre-screens',
-        incumbentTurnaround: 'On demand, but subscription gated',
-        incumbentCost: '$149/month for 200 AI pre-screens (public price, verified 2026-09-11)',
-        toolAuditTurnaround: 'Measured provider calls complete in seconds',
-        toolAuditCost: '$0.2385 for the measured three-call Monid pre-screen',
-        comparisonNote: 'At 200 identical checks, raw Monid call cost is $47.70; scopes differ and hosting/engineering are excluded.'
-      },
       timestamp,
       auditHash
     };

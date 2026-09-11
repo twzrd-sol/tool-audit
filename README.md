@@ -35,7 +35,7 @@ product scopes are not identical.
 
 The paid path is deliberately hard to trigger:
 
-1. A Monid key must be supplied through `MONID_API_KEY` (or `MONID_API`).
+1. A Monid key must be supplied through `MONID_API_KEY`.
    Missing credentials fail closed; there is no fixture or simulated fallback.
 2. Every required endpoint must appear in live `discover` results.
 3. `inspect` must return a supported, bounded price and schema.
@@ -44,6 +44,15 @@ The paid path is deliberately hard to trigger:
 6. The CLI requires the literal `--confirm-spend` flag.
 7. Every run must end `COMPLETED` with a 2xx provider response and a cost
    receipt.
+
+`--max-total` is a preflight over inspected prices, not an atomic price lock.
+For unattended production use, also configure Monid's workspace run cap in
+the Monid dashboard so a price change between `inspect` and `run` is enforced
+server-side.
+
+Paid requests are never retried automatically. If transport fails before a
+run ID is received, the client reports an ambiguous outcome and instructs the
+operator to reconcile recent Monid runs before trying again.
 
 Unknown evidence is never converted into approval. The measured cookie result
 is explicitly limited: only partial HTML was analyzed and JavaScript-set
@@ -65,6 +74,13 @@ export MONID_API_KEY='monid_live_...'
 ```
 
 `.env` files are ignored. Never commit the key.
+
+Verify the saved run IDs and costs against Monid without creating a new paid
+run:
+
+```bash
+npm run verify:evidence
+```
 
 ## Free pre-spend path
 

@@ -15,7 +15,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "tsx src/server.ts",
-    "test": "npm run build && node --test dist/**/*.test.js"
+    "test": "npm run build && node --test dist/**/*.test.js",
+    "verify:evidence": "npm run build && node scripts/verify-evidence.mjs"
   },
   "keywords": ["monid", "agent-security", "vendor-audit", "pre-spend", "mcp"],
   "author": "twzrd",
