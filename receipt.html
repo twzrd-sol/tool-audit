@@ -1,3 +1,71 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>tool-audit · live Monid receipts</title><style>
-:root{--bg:#07080d;--panel:#0d1018;--line:#23283a;--text:#e8edf7;--muted:#8f99ad;--green:#39df96;--blue:#69c6ff;--purple:#9aa7ff;--amber:#ffcd67}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#2032a933,transparent 32%),var(--bg);color:var(--text);font:15px/1.55 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}.wrap{width:min(1060px,calc(100% - 36px));margin:auto;padding:30px 0 50px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.brand{font-weight:900}.pill{font-size:11px;color:var(--green);border:1px solid #39df9655;background:#39df9612;border-radius:99px;padding:5px 9px}.terminal{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--panel);box-shadow:0 24px 80px #0008}.bar{height:43px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:0 16px;background:#121622}.dot{width:10px;height:10px;border-radius:50%}.r{background:#ff6b7a}.y{background:#ffd166}.g{background:#49d890}.title{color:var(--muted);font-size:12px;margin-left:8px}.screen{padding:24px}.cmd{color:#dce7ff;margin:0 0 17px}.prompt{color:var(--green)}.dim{color:var(--muted)}.run{display:grid;grid-template-columns:95px 1fr 110px 82px;gap:12px;align-items:center;padding:13px 0;border-top:1px solid #1d2230}.run:first-of-type{border-top:0}.provider{color:var(--blue)}.id{color:var(--muted);font-size:12px}.ok{color:var(--green);font-weight:800}.cost{color:var(--purple);font-weight:900;text-align:right}.total{margin-top:20px;padding:17px;border:1px solid #5366ff77;background:#5366ff13;border-radius:11px;display:flex;align-items:center;justify-content:space-between}.total strong{font-size:28px;color:#8cddff}.verdict{margin-top:18px;padding:15px 17px;border-left:3px solid var(--amber);background:#ffcd670d;color:#d7dfed}.verdict b{color:var(--amber)}.foot{display:flex;justify-content:space-between;color:var(--muted);margin-top:18px;font:12px system-ui,sans-serif}@media(max-width:750px){.run{grid-template-columns:80px 1fr}.ok,.cost{text-align:left}.foot{display:block}}
-</style></head><body><main class="wrap"><div class="top"><div class="brand">tool-audit / live-proof</div><div class="pill">● MONID · MEASURED 2026-09-11 UTC</div></div><section class="terminal"><div class="bar"><i class="dot r"></i><i class="dot y"></i><i class="dot g"></i><span class="title">discover → inspect → run → receipt</span></div><div class="screen"><p class="cmd"><span class="prompt">$</span> monid discover -q <span class="dim">"vendor security pre-screen"</span><br><span class="prompt">$</span> monid inspect <span class="dim">[selected endpoints]</span><br><span class="prompt">$</span> monid runs list -j</p><div class="run"><span class="provider">context.dev</span><span><b>pricing extraction</b><br><span class="id">01M26ZQCF2RTDKB9WQ5XBQX3EW</span></span><span class="ok">COMPLETED</span><span class="cost">$0.0009</span></div><div class="run"><span class="provider">Strale</span><span><b>security headers</b><br><span class="id">01M26ZRF377CFWF9SAQF94MHXD</span></span><span class="ok">COMPLETED</span><span class="cost">$0.0594</span></div><div class="run"><span class="provider">Strale</span><span><b>cookie / consent</b><br><span class="id">01M26ZRWB37QR0XZ72ED0KESAJ</span></span><span class="ok">COMPLETED</span><span class="cost">$0.1782</span></div><div class="total"><span>Measured end-to-end Monid cost</span><strong>$0.2385</strong></div><div class="verdict"><b>review_required</b> · Header evidence found risk. Cookie evidence remains <b>unable_to_verify</b>: only partial HTML was analyzed and JavaScript-set cookies were not observed. Missing evidence never becomes “safe.”</div></div></section><div class="foot"><span>Incumbent receipt: Vendorapp Startup · $149/month · 200 AI pre-screens</span><span>github.com/twzrd-sol/tool-audit · #monid</span></div></main></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>tool-audit — measured receipts</title>
+  <style>
+    :root { --bg:#101114; --card:#1a1c21; --ink:#f4f1ea; --muted:#b7b1a4; --line:#2b2e36; --amber:#d7a04a; --amber-bg:#2a2214; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 16px/1.45 "Liberation Mono", FreeMono, monospace; background: var(--bg); color: var(--ink); }
+    main { max-width: 860px; margin: 0 auto; padding: 32px 20px 64px; }
+    h1 { font-family: "Liberation Sans", FreeSans, sans-serif; }
+    .kicker { color: var(--amber); letter-spacing: 0.12em; font-size: 12px; text-transform: uppercase; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin: 12px 0; }
+    .amber { background: var(--amber-bg); border-color: var(--amber); }
+    .muted { color: var(--muted); }
+    a { color: var(--ink); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-weight: 500; }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="kicker">Measured snapshot · 2026-09-11 UTC · not live-proof</p>
+    <h1>tool-audit receipts</h1>
+    <p class="muted">Static reprint of three COMPLETED / HTTP 200 / USD receipts. Successful chain $0.2385. Total experiment spend $0.2394 including earlier attempt 01M272SPTD953E3M0WVHF2WSN2 at $0.0009. This replaces first-pass evidence collection before downstream tool spend. This page does not query Monid.</p>
+    <div class="card">
+      <p>Actual discovery queries used:</p>
+      <pre>monid discover -q "extract web page content"
+monid discover -q "website security headers"
+monid discover -q "website cookie consent scan"</pre>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Purpose</th><th>Provider / endpoint</th><th>Run</th><th>Status</th><th>Cost</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>incumbent_price</td>
+          <td>context.dev<br>/web/scrape/markdown</td>
+          <td>01M26ZQCF2RTDKB9WQ5XBQX3EW</td>
+          <td>COMPLETED / 200</td>
+          <td>$0.0009</td>
+        </tr>
+        <tr>
+          <td>security_headers</td>
+          <td>api.strale.io<br>/x402/header-security-check</td>
+          <td>01M26ZRF377CFWF9SAQF94MHXD</td>
+          <td>COMPLETED / 200</td>
+          <td>$0.0594</td>
+        </tr>
+        <tr>
+          <td>cookie_consent</td>
+          <td>api.strale.io<br>/x402/v2/cookie-scan</td>
+          <td>01M26ZRWB37QR0XZ72ED0KESAJ</td>
+          <td>COMPLETED / 200</td>
+          <td>$0.1782</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="card amber">
+      <p class="kicker">Cookie check</p>
+      <p>UNABLE_TO_VERIFY</p>
+      <p>Partial HTML analyzed. JavaScript-set cookies not observed. Decision: REVIEW_REQUIRED.</p>
+    </div>
+    <p>discover → inspect → run. Canonical file: <a href="https://github.com/twzrd-sol/tool-audit/blob/main/evidence/measured-demo.json">evidence/measured-demo.json</a></p>
+    <p><a href="./">Snapshot home</a> · <a href="./film.html">1080p storyboard</a> · <a href="https://github.com/twzrd-sol/tool-audit">Source</a></p>
+  </main>
+</body>
+</html>
