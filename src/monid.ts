@@ -12,6 +12,8 @@ interface JsonSchema {
 interface RawEndpoint {
   provider?: string;
   providerName?: string;
+  docUrl?: string;
+  tags?: string[];
   endpoint?: string;
   description?: string;
   summary?: string;
@@ -213,7 +215,9 @@ export class MonidClient {
         baseFeeUsd,
         ...(unitFeeUsd === undefined ? {} : { unitFeeUsd }),
         ...(price.notes ? { notes: price.notes } : {})
-      }
+      },
+      ...(raw.docUrl ? { docUrl: String(raw.docUrl) } : {}),
+      ...(Array.isArray(raw.tags) ? { tags: raw.tags.map(String) } : {})
     };
   }
 

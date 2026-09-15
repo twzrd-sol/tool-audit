@@ -1,0 +1,275 @@
+{
+  "schema": "tool-audit.counterparty-plan.v1",
+  "targets": [
+    {
+      "host": "parse.bot",
+      "brands": [
+        "AAA Gas Prices",
+        "AccuWeather",
+        "Artificial Analysis",
+        "Built In",
+        "Capterra",
+        "Clutch",
+        "Crunchbase",
+        "Finviz",
+        "G2",
+        "GetApp",
+        "Homes.com",
+        "IQAir",
+        "Idealist",
+        "Indeed",
+        "LMArena",
+        "Levels.fyi",
+        "LoopNet",
+        "MarketBeat",
+        "Nasdaq",
+        "SECForm4",
+        "StockAnalysis",
+        "The Companies API",
+        "Trustpilot",
+        "Weather Underground",
+        "Web3 Career",
+        "Wellfound",
+        "Y Combinator",
+        "Yahoo Finance",
+        "Zillow"
+      ],
+      "fronted": true
+    },
+    {
+      "host": "ahrefs.com",
+      "brands": [
+        "Ahrefs"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "akta.pro",
+      "brands": [
+        "Akta"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "alibabacloud.com",
+      "brands": [
+        "Alibaba"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "apify.com",
+      "brands": [
+        "Apify"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "apollo.io",
+      "brands": [
+        "Apollo"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "asksurf.ai",
+      "brands": [
+        "Surf"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "blockrun.ai",
+      "brands": [
+        "BlockRun"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "browserbase.com",
+      "brands": [
+        "Browserbase"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "byteplus.com",
+      "brands": [
+        "ByteDance"
+      ],
+      "fronted": true
+    },
+    {
+      "host": "clay.com",
+      "brands": [
+        "Clay"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "contactout.com",
+      "brands": [
+        "ContactOut"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "context.dev",
+      "brands": [
+        "Context.dev"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "elevenlabs.io",
+      "brands": [
+        "ElevenLabs"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "exa.ai",
+      "brands": [
+        "Exa"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "firecrawl.dev",
+      "brands": [
+        "Firecrawl"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "google.dev",
+      "brands": [
+        "Google Gemini"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "hunter.io",
+      "brands": [
+        "Hunter"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "itsgloria.ai",
+      "brands": [
+        "Gloria"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "kadec0.xyz",
+      "brands": [
+        "api.kadec0.xyz"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "kling.ai",
+      "brands": [
+        "Kling"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "minimax.io",
+      "brands": [
+        "MiniMax"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "mrscraper.com",
+      "brands": [
+        "MrScraper"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "octen.ai",
+      "brands": [
+        "Octen"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "peopledatalabs.com",
+      "brands": [
+        "People Data Labs"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "ploid.com",
+      "brands": [
+        "Ploid"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "semrush.com",
+      "brands": [
+        "Semrush"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "strale.io",
+      "brands": [
+        "Strale"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "suzanne3d.com",
+      "brands": [
+        "Suzanne"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "tinyfish.ai",
+      "brands": [
+        "TinyFish"
+      ],
+      "fronted": false
+    },
+    {
+      "host": "tryfundable.ai",
+      "brands": [
+        "Fundable"
+      ],
+      "fronted": false
+    }
+  ],
+  "unscreenable": [
+    {
+      "provider": "defillama",
+      "providerName": "DefiLlama",
+      "reason": "No documentation host is published, so no counterparty can be named. Not screened and not approved."
+    },
+    {
+      "provider": "sfs",
+      "providerName": "Simple FS",
+      "reason": "No documentation host is published, so no counterparty can be named. Not screened and not approved."
+    },
+    {
+      "provider": "tikhub",
+      "providerName": "TikHub",
+      "reason": "No documentation host is published, so no counterparty can be named. Not screened and not approved."
+    }
+  ],
+  "listedBrands": 59,
+  "distinctCounterparties": 31,
+  "screensAvoided": 28,
+  "unitPriceUsd": 0.0594,
+  "naiveCostUsd": 3.5046,
+  "dedupedCostUsd": 1.8414,
+  "savedUsd": 1.6632,
+  "note": "Screening targets are the hosts that answer, not the brands that are listed. Undocumented listings are excluded from the paid set and remain unevaluated, which is not the same as clean."
+}

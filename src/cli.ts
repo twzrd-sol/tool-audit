@@ -3,6 +3,8 @@ import { ToolAuditor } from './auditor.js';
 import { MonidClient } from './monid.js';
 import { discoverInspectAndAudit, executeWithAudit } from './index.js';
 import { runVendorPrescreen } from './vendor-prescreen.js';
+import { checkProvenance } from './provenance.js';
+import { sweepCatalogProvenance } from './catalog-provenance.js';
 
 async function main() {
   const args = process.argv.slice(2);
@@ -67,6 +69,54 @@ async function main() {
     return;
   }
 
+  if (command === 'provenance') {
+    const toolId = args[1] || 'nasdaq:/get_stock_quote';
+    const client = new MonidClient();
+    const tool = await client.inspect(toolId);
+    if (!tool) throw new Error(`Tool '${toolId}' was not returned by Monid inspect.`);
+    const finding = checkProvenance({
+      provider: tool.provider,
+      providerName: tool.name,
+      endpoint: toolId,
+      ...(tool.docUrl ? { docUrl: tool.docUrl } : {}),
+      ...(tool.tags ? { tags: tool.tags } : {})
+    });
+    console.log(JSON.stringify(finding, null, 2));
+    // A mismatch is evidence to act on, not a hard failure: exit 3 marks it
+    // distinctly from the auditor's BLOCKED (2) so callers can route on it.
+    if (finding.classification !== 'first_party_doc_host') process.exitCode = 3;
+    return;
+  }
+
+  if (command === 'catalog-provenance') {
+    const outIndex = args.indexOf('--out');
+    const out = outIndex >= 0 ? args[outIndex + 1] : undefined;
+    const client = new MonidClient();
+    console.log(`\n🔍 Sweeping catalog provenance. Discovery and inspection only — no paid run.\n`);
+    const snapshot = await sweepCatalogProvenance(client, {
+      onProgress: msg => console.error(`   ${msg}`)
+    });
+    const json = JSON.stringify(snapshot, null, 2);
+    if (out) {
+      const { writeFileSync } = await import('node:fs');
+      writeFileSync(out, json + '\n');
+      console.log(`Wrote ${out}`);
+    }
+    console.table([{
+      Providers: snapshot.total,
+      'First-party doc host': snapshot.firstPartyDocHost,
+      'Third-party doc host': snapshot.thirdPartyDocHost,
+      Undocumented: snapshot.undocumented,
+      'Verified, not first-party': snapshot.verifiedButNotFirstParty,
+      'Paid runs': snapshot.paidRuns
+    }]);
+    for (const front of snapshot.fronts) {
+      console.log(`  ${front.domain} fronts ${front.count}: ${front.brands.join(', ')}`);
+    }
+    console.log(`\n${snapshot.limitation}\n`);
+    return;
+  }
+
   if (command === 'consume') {
     if (!args.includes('--confirm-spend')) {
       console.error(`🛑 Refused: consume can spend Monid balance. Re-run with --confirm-spend.`);
@@ -106,6 +156,8 @@ async function main() {
   console.log(`Usage:`);
   console.log(`  tool-audit compare`);
   console.log(`  tool-audit audit <provider:/endpoint>`);
+  console.log(`  tool-audit provenance <provider:/endpoint>`);
+  console.log(`  tool-audit catalog-provenance [--out evidence/catalog-provenance.json]`);
   console.log(`  tool-audit discover-audit "<query>"`);
   console.log(`  tool-audit consume "<query>" --input '<json>' --confirm-spend`);
   console.log(`  tool-audit prescreen <https-url> --max-total 0.24 --confirm-spend`);

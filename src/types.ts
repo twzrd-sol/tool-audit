@@ -28,6 +28,10 @@ export interface MonidEndpoint {
   };
   outputSchema?: Record<string, unknown>;
   pricing: MonidPricing;
+  /** Documentation URL as published by Monid. The one operator signal per endpoint. */
+  docUrl?: string;
+  /** Listing tags as published by Monid, e.g. `verified`. */
+  tags?: string[];
   authType?: 'bearer' | 'api-key' | 'none';
   headers?: Record<string, string>;
 }
