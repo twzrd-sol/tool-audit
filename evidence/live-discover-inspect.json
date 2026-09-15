@@ -1,0 +1,49 @@
+{
+  "schema": "tool-audit.live-discover-inspect.v1",
+  "kind": "free-monid-call",
+  "label": "Live Monid discover + inspect captured 2026-09-11. Discover and inspect are not paid runs.",
+  "capturedAt": "2026-09-11T02:35:00.000Z",
+  "discover": {
+    "query": "extract web page content",
+    "limit": 20,
+    "count": 20,
+    "requiredHitRank": 9,
+    "requiredHit": {
+      "provider": "context.dev",
+      "endpoint": "/web/scrape/markdown",
+      "price": {
+        "type": "PER_CALL",
+        "amount": {
+          "value": 0.0009,
+          "currency": "USD"
+        }
+      }
+    }
+  },
+  "inspect": {
+    "provider": "context.dev",
+    "endpoint": "/web/scrape/markdown",
+    "method": "GET",
+    "price": {
+      "type": "PER_CALL",
+      "amount": {
+        "value": 0.0009,
+        "currency": "USD"
+      }
+    },
+    "queryParams": [
+      "country",
+      "includeFrames",
+      "includeImages",
+      "includeLinks",
+      "maxAgeMs",
+      "settleAnimations",
+      "shortenBase64Images",
+      "timeoutMS",
+      "url",
+      "useMainContentOnly",
+      "waitForMs",
+      "zdr"
+    ]
+  }
+}

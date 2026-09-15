@@ -1,0 +1,163 @@
+{
+  "schema": "tool-audit.market-scan.v1",
+  "scannedAt": "2026-09-15T11:16:10.278Z",
+  "queries": [
+    "web scraping",
+    "company data enrichment",
+    "social media scraper",
+    "search engine results",
+    "security scan",
+    "email finder",
+    "SEO backlinks",
+    "ecommerce product data",
+    "image generation",
+    "video generation",
+    "llm inference",
+    "blockchain onchain data",
+    "news articles",
+    "job listings",
+    "real estate",
+    "weather",
+    "maps places",
+    "translation",
+    "pdf document parsing",
+    "sentiment analysis",
+    "domain whois dns",
+    "stock market finance",
+    "sports odds",
+    "flight travel",
+    "government public records"
+  ],
+  "endpointsSeen": 412,
+  "distinctProviders": 63,
+  "paidRuns": 0,
+  "costUsd": 0,
+  "categories": {
+    "text_extraction": {
+      "label": "Text / document extraction",
+      "keywordMatches": 67,
+      "sellerCount": 67,
+      "distinctProviders": 11,
+      "floorPriceUsd": 0.00009,
+      "freeOrZeroPriced": 6,
+      "excludedOnReview": [],
+      "examples": [
+        {
+          "id": "mrscraper:/scrape/html",
+          "priceUsd": 0.001,
+          "model": "per-result"
+        },
+        {
+          "id": "mrscraper:/scrape/extract",
+          "priceUsd": 0.001,
+          "model": "per-result"
+        },
+        {
+          "id": "mrscraper:/scrape/map",
+          "priceUsd": 0.001,
+          "model": "per-result"
+        },
+        {
+          "id": "context.dev:/web/scrape/sitemap",
+          "priceUsd": 0.0009,
+          "model": "per-call"
+        },
+        {
+          "id": "context.dev:/web/scrape/html",
+          "priceUsd": 0.0009,
+          "model": "per-call"
+        },
+        {
+          "id": "apify:/apidojo/tweet-scraper",
+          "priceUsd": 0.0006,
+          "model": "per-result"
+        }
+      ]
+    },
+    "counterparty_provenance": {
+      "label": "Counterparty provenance (who operates this endpoint)",
+      "keywordMatches": 1,
+      "sellerCount": 0,
+      "distinctProviders": 0,
+      "floorPriceUsd": null,
+      "freeOrZeroPriced": 0,
+      "excludedOnReview": [
+        {
+          "id": "weather-underground:/get_historical_airport",
+          "reason": "Keyword match on station operator language. Historical airport weather, not endpoint provenance."
+        }
+      ],
+      "examples": []
+    },
+    "domain_registration": {
+      "label": "Domain registration (WHOIS) — adjacent, answers a different question",
+      "keywordMatches": 5,
+      "sellerCount": 5,
+      "distinctProviders": 2,
+      "floorPriceUsd": 0.022,
+      "freeOrZeroPriced": 0,
+      "excludedOnReview": [],
+      "examples": [
+        {
+          "id": "api.kadec0.xyz:/v1/domain-info",
+          "priceUsd": 0.022,
+          "model": "per-call"
+        },
+        {
+          "id": "api.strale.io:/x402/whois-lookup",
+          "priceUsd": 0.0594,
+          "model": "per-call"
+        },
+        {
+          "id": "api.strale.io:/x402/v2/whois-lookup",
+          "priceUsd": 0.0594,
+          "model": "per-call"
+        },
+        {
+          "id": "api.kadec0.xyz:/v1/whois-bulk",
+          "priceUsd": 0.055,
+          "model": "per-call"
+        },
+        {
+          "id": "api.strale.io:/x402/domain-age-check",
+          "priceUsd": 0.03564,
+          "model": "per-call"
+        }
+      ]
+    },
+    "security_posture": {
+      "label": "Security posture of a host",
+      "keywordMatches": 4,
+      "sellerCount": 4,
+      "distinctProviders": 1,
+      "floorPriceUsd": 0.0594,
+      "freeOrZeroPriced": 0,
+      "excludedOnReview": [],
+      "examples": [
+        {
+          "id": "api.strale.io:/x402/header-security-check",
+          "priceUsd": 0.0594,
+          "model": "per-call"
+        },
+        {
+          "id": "api.strale.io:/x402/gdpr-website-check",
+          "priceUsd": 0.1188,
+          "model": "per-call"
+        },
+        {
+          "id": "api.strale.io:/x402/solutions/website-health",
+          "priceUsd": 0.475201,
+          "model": "per-call"
+        },
+        {
+          "id": "api.strale.io:/x402/domain-reputation",
+          "priceUsd": 0.0594,
+          "model": "per-call"
+        }
+      ]
+    }
+  },
+  "coverage": "endpoints surfaced by the listed queries; not a guaranteed full enumeration",
+  "note": "Category membership is keyword classification over listing descriptions, then manual review. It is a floor on how many sellers exist, not a census. Exclusions are listed per category with their reason rather than removed from the patterns.",
+  "priceBasis": "PER_CALL uses the call price; PER_RESULT uses the per-result fee, not the flat fee. floorPriceUsd ignores zero-priced listings and counts them separately."
+}

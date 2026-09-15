@@ -36,6 +36,8 @@
       padding: 48px 64px;
       display: none;
     }
+    body.nocap .cap { display: none; }
+    body.nocap .scene { bottom: 36px; }
     .scene.show { display: block; }
     .kicker { color: #d7a04a; letter-spacing: 0.14em; font-size: 16px; text-transform: uppercase; margin: 0 0 16px; }
     h1 { font-size: 56px; line-height: 1.08; margin: 0 0 28px; font-weight: 700; }
@@ -193,27 +195,32 @@ Bounded PER_CALL / USD. Advertised fee $0.0009. No spend yet.</div>
     </section>
 
     <section class="scene" id="sc7">
-      <p class="kicker">#monid</p>
+      <p class="kicker">#monid · measured evidence cut</p>
       <h1>tool-audit</h1>
-      <p style="font-size:34px;margin:8px 0">Live demo: twzrd-sol.github.io/tool-audit</p>
-      <p style="font-size:34px;margin:8px 0">Source: github.com/twzrd-sol/tool-audit</p>
-      <p style="font-size:28px;margin-top:28px">3 live Monid calls · $0.2385 chain · $0.2394 experiment</p>
+      <div class="nums">
+        <div><div class="num">$149/month</div><div class="muted">Vendorapp</div></div>
+        <div><div class="num">$0.2385</div><div class="muted">Successful chain</div></div>
+        <div><div class="num">$0.2394</div><div class="muted">Total experiment spend</div></div>
+      </div>
+      <p style="font-size:28px;margin-top:36px">twzrd-sol.github.io/tool-audit</p>
+      <p class="muted">github.com/twzrd-sol/tool-audit</p>
     </section>
 
     <div class="cap" id="cap"></div>
   </div>
   <script>
     const scenes = [
-      { id: 'sc0', from: 0, to: 5, step: 0, cap: 'Vendorapp charges <em>$149</em> a month for 200 AI pre-screens.<br>We replaced its first-pass evidence check with three live Monid calls.' },
-      { id: 'sc1', from: 5, to: 8, step: 0, cap: 'Vendorapp: <em>$149/mo</em> · Monid chain: <em>$0.2385</em><br>Total experiment spend: <em>$0.2394</em> · not a full Vendorapp replacement' },
-      { id: 'sc2', from: 8, to: 16, step: 0, cap: 'Live Monid <em>discover</em> — extract web page content<br>context.dev /web/scrape/markdown · PER_CALL $0.0009' },
-      { id: 'sc3', from: 16, to: 22, step: 1, cap: 'Live Monid <em>inspect</em> — schema and USD price<br>GET · bounded PER_CALL · no spend yet' },
-      { id: 'sc4', from: 22, to: 32, step: 2, cap: 'Three <em>COMPLETED</em> / HTTP 200 runs<br>Successful chain <em>$0.2385</em> · experiment <em>$0.2394</em>' },
-      { id: 'sc5', from: 32, to: 43, step: 3, cap: 'Cookie check <em>UNABLE_TO_VERIFY</em><br>Decision: <em>REVIEW_REQUIRED</em>' },
-      { id: 'sc6', from: 43, to: 52, step: 3, cap: 'discover → inspect → run before an agent spends on the downstream tool.<br>Not monitoring, remediation, contracts, or human review.' },
-      { id: 'sc7', from: 52, to: 56, step: 3, cap: 'twzrd-sol.github.io/tool-audit<br>3 live Monid calls · <em>$0.2385</em> · <em>$0.2394</em> · #monid' }
+      { id: 'sc0', from: 0, to: 5.5, step: 0, cap: 'Vendorapp charges <em>$149</em> a month for 200 AI pre-screens.<br>We replaced its first-pass evidence check with three live Monid calls.' },
+      { id: 'sc1', from: 5.5, to: 23.7, step: 0, cap: 'Vendorapp: <em>$149/mo</em> · Monid chain: <em>$0.2385</em><br>Total experiment spend: <em>$0.2394</em>' },
+      { id: 'sc2', from: 23.7, to: 26.8, step: 0, cap: 'Live Monid <em>discover</em> — extract web page content<br>context.dev /web/scrape/markdown · PER_CALL $0.0009' },
+      { id: 'sc3', from: 26.8, to: 29.8, step: 1, cap: 'Live Monid <em>inspect</em> — schema and USD price<br>GET · bounded PER_CALL · no spend yet' },
+      { id: 'sc4', from: 29.8, to: 36.0, step: 2, cap: 'Three <em>COMPLETED</em> / HTTP 200 runs<br>Successful chain <em>$0.2385</em> · experiment <em>$0.2394</em>' },
+      { id: 'sc5', from: 36.0, to: 44.0, step: 3, cap: 'Cookie check <em>UNABLE_TO_VERIFY</em><br>Decision: <em>REVIEW_REQUIRED</em>' },
+      { id: 'sc6', from: 44.0, to: 53.6, step: 3, cap: 'First-pass evidence before downstream tool spend.<br>Not monitoring, remediation, contracts, or human review.' },
+      { id: 'sc7', from: 53.6, to: 57.1, step: 3, cap: 'Vendorapp <em>$149/month</em> · chain <em>$0.2385</em> · experiment <em>$0.2394</em><br>#monid' }
     ];
     const params = new URLSearchParams(location.search);
+    if (params.has('nocap')) document.body.classList.add('nocap');
     const frozen = params.has('t') ? Number(params.get('t')) : null;
     function showAt(t) {
       const scene = scenes.find(s => t >= s.from && t < s.to) || scenes[scenes.length - 1];
