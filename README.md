@@ -31,6 +31,16 @@ A Monid discovery result gives an agent a brand name and often a `verified`
 tag. Neither names the operator. The closest thing Monid publishes is the
 documentation URL on the listing, so we read one per provider.
 
+The ordering is the whole point, so it is measured rather than assumed. A
+discovery result carries `description`, `endpoint`, `metrics`, `price`,
+`provider`, `providerName`, `score` and `tags`. `docUrl` is not among them. It
+appears only after a separate `inspect` call, alongside `categories`, `input`,
+`method`, `notes` and `summary`. An agent choosing a tool therefore sees the
+brand and the `verified` tag, and cannot see the documentation host until it
+asks. Balance $20.68 before and $20.68 after, so asking costs nothing —
+[`evidence/selection-blindness.json`](evidence/selection-blindness.json),
+reproduce with `node scripts/selection-blindness.mjs`.
+
 Swept with discovery and inspection only — 25 seed queries surfaced **409
 endpoints across 62 providers**, and we inspected **one endpoint per provider,
 62 in all**, for **$0.00**. Workspace balance $22.46 before and $22.46 after:
@@ -97,7 +107,13 @@ Full write-up: <https://twzrd-sol.github.io/tool-audit/counterparty.html>
 node dist/cli.js catalog-provenance --out evidence/catalog-provenance.json   # free
 node dist/cli.js cohort-screen --confirm-spend --max-total 2                 # paid
 node scripts/market-scan.mjs                                                 # free
+node scripts/selection-blindness.mjs                                         # free
 ```
+
+Every figure on the published page is read out of `evidence/` at build time,
+and `npm test` rebuilds the page and fails if the committed copy differs by a
+byte (`npm run verify:page`). A number cannot be edited into the page without
+editing the evidence it came from.
 
 ### What this does not establish
 

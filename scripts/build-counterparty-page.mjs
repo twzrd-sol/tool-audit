@@ -11,6 +11,8 @@ import { readFileSync, writeFileSync } from 'node:fs';
 const prov = JSON.parse(readFileSync('evidence/catalog-provenance.json', 'utf8'));
 const plan = JSON.parse(readFileSync('evidence/counterparty-plan.json', 'utf8'));
 const screen = JSON.parse(readFileSync('evidence/counterparty-screen.json', 'utf8'));
+const blind = JSON.parse(readFileSync('evidence/selection-blindness.json', 'utf8'));
+const OUT = process.argv[2] || 'pages/counterparty.html';
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const usd = n => '$' + Number(n).toFixed(4);
@@ -96,6 +98,7 @@ const html = `<!doctype html>
     <p class="kicker">Measured ${esc(screen.screenedAt.slice(0, 10))} · reproducible · not a live query</p>
     <h1>Our first pass asked what a vendor check costs. The question before that one is who the listing actually points to.</h1>
     <p class="lede muted">A Monid discovery result gives an agent a brand name and, often, a <code>verified</code> tag. Neither of those names the operator behind the endpoint. The closest thing Monid publishes is the documentation URL on the listing — so we read one per provider, ${prov.total} in all.</p>
+    <div class="limit"><strong>The ordering is the whole point, so we measured it.</strong> Across ${blind.queries.length} queries, a discovery result carried <code>${blind.fieldsAtSelection.join('</code>, <code>')}</code>. <code>docUrl</code> was not among them: it appears only after a separate <code>inspect</code> call, alongside <code>${blind.fieldsOnlyAvailableAfterInspect.filter(f => f !== 'docUrl').join('</code>, <code>')}</code>. So an agent choosing a tool sees the brand and the ${blind.verifiedTagAtSelection ? '<code>verified</code> tag' : 'tags'}, and cannot see the documentation host until it asks for it. Balance ${esc(blind.balanceCheck.before)} before and ${esc(blind.balanceCheck.after)} after — asking costs nothing.</div>
 
     <div class="grid three" style="margin:28px 0">
       <div class="card"><div class="stat">${prov.total}</div><div class="label">providers inspected, one listing each<br>out of ${prov.endpointsSeen} endpoints surfaced</div></div>
@@ -157,7 +160,7 @@ node dist/cli.js cohort-screen --confirm-spend --max-total 2                 # p
 </html>
 `;
 
-writeFileSync('pages/counterparty.html', html);
-console.log(`Wrote pages/counterparty.html (${html.length} bytes)`);
+writeFileSync(OUT, html);
+console.log(`Wrote ${OUT} (${html.length} bytes)`);
 console.log(`  providers ${prov.total}, third-party ${prov.thirdPartyDocHost}, front ${front.domain} x${front.count}`);
 console.log(`  screened ${screen.screened}, brands ${screen.brandsCovered}, spent ${usd(screen.spentUsd)}`);
