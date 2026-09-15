@@ -1,0 +1,469 @@
+{
+  "schema": "tool-audit.counterparty-screen.v1",
+  "screenedAt": "2026-09-15T02:59:43.483Z",
+  "tool": "api.strale.io:/x402/header-security-check",
+  "unitPriceUsd": 0.0594,
+  "maxTotalUsd": 2,
+  "attempted": 31,
+  "screened": 30,
+  "failed": 1,
+  "spentUsd": 1.782,
+  "brandsCovered": 58,
+  "gradeDistribution": {
+    "C": 7,
+    "A": 6,
+    "F": 11,
+    "D": 5,
+    "B": 1
+  },
+  "results": [
+    {
+      "host": "parse.bot",
+      "brands": [
+        "AAA Gas Prices",
+        "AccuWeather",
+        "Artificial Analysis",
+        "Built In",
+        "Capterra",
+        "Clutch",
+        "Crunchbase",
+        "Finviz",
+        "G2",
+        "GetApp",
+        "Homes.com",
+        "IQAir",
+        "Idealist",
+        "Indeed",
+        "LMArena",
+        "Levels.fyi",
+        "LoopNet",
+        "MarketBeat",
+        "Nasdaq",
+        "SECForm4",
+        "StockAnalysis",
+        "The Companies API",
+        "Trustpilot",
+        "Weather Underground",
+        "Web3 Career",
+        "Wellfound",
+        "Y Combinator",
+        "Yahoo Finance",
+        "Zillow"
+      ],
+      "fronted": true,
+      "outcome": "screened",
+      "runId": "01M2HFYYD0K9S46AKQ0Q78R9XZ",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "C",
+      "score": 75
+    },
+    {
+      "host": "ahrefs.com",
+      "brands": [
+        "Ahrefs"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HFZ2J69T3R3JHA8K6MYH7E",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "A",
+      "score": 90
+    },
+    {
+      "host": "akta.pro",
+      "brands": [
+        "Akta"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HFZ6QFS8K13NDRMM39QB6P",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "F",
+      "score": 35
+    },
+    {
+      "host": "alibabacloud.com",
+      "brands": [
+        "Alibaba"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HFZAR72CTR5NFN4V7CFQJP",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "D",
+      "score": 45
+    },
+    {
+      "host": "apify.com",
+      "brands": [
+        "Apify"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HFZHSS6KCJ8EWWXTQHNB6X",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "B",
+      "score": 80
+    },
+    {
+      "host": "apollo.io",
+      "brands": [
+        "Apollo"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HFZNNXAGCCTP0QXHFPZF15",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "D",
+      "score": 55
+    },
+    {
+      "host": "asksurf.ai",
+      "brands": [
+        "Surf"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HFZSSAW27CC9HK68996J5B",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "F",
+      "score": 35
+    },
+    {
+      "host": "blockrun.ai",
+      "brands": [
+        "BlockRun"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HFZYQW6KJT0XY90QXBYNTG",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "C",
+      "score": 75
+    },
+    {
+      "host": "browserbase.com",
+      "brands": [
+        "Browserbase"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG041929HE44RWE7WZT9NW",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "F",
+      "score": 35
+    },
+    {
+      "host": "byteplus.com",
+      "brands": [
+        "ByteDance"
+      ],
+      "fronted": true,
+      "outcome": "screened",
+      "runId": "01M2HG084W3W1XHBCE7E4ZP54K",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "F",
+      "score": 10
+    },
+    {
+      "host": "clay.com",
+      "brands": [
+        "Clay"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG0CZRCCCEBE5XPGYWRQGZ",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "D",
+      "score": 45
+    },
+    {
+      "host": "contactout.com",
+      "brands": [
+        "ContactOut"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG0H7569SXWF5YJ3J324P2",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "C",
+      "score": 70
+    },
+    {
+      "host": "context.dev",
+      "brands": [
+        "Context.dev"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG0NRQ9M7X8W73BT7GGZPG",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "F",
+      "score": 35
+    },
+    {
+      "host": "elevenlabs.io",
+      "brands": [
+        "ElevenLabs"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG0T5J4KWN14196M6TGB9W",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "C",
+      "score": 60
+    },
+    {
+      "host": "exa.ai",
+      "brands": [
+        "Exa"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG0Y9ZCXD6F6Z806RZW3AA",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "A",
+      "score": 90
+    },
+    {
+      "host": "firecrawl.dev",
+      "brands": [
+        "Firecrawl"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG1257ATKJQXFMZE481BZH",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "A",
+      "score": 100
+    },
+    {
+      "host": "google.dev",
+      "brands": [
+        "Google Gemini"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG173MZPMQJCFQYXYH14D2",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "C",
+      "score": 70
+    },
+    {
+      "host": "hunter.io",
+      "brands": [
+        "Hunter"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG1BWYTAZK9H6ZX08EAGWJ",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "C",
+      "score": 75
+    },
+    {
+      "host": "itsgloria.ai",
+      "brands": [
+        "Gloria"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG1G8MB488192RNH4WXTDV",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "F",
+      "score": 35
+    },
+    {
+      "host": "kadec0.xyz",
+      "brands": [
+        "api.kadec0.xyz"
+      ],
+      "fronted": false,
+      "outcome": "failed",
+      "runId": "01M2HG1M640RE9P87A3HDD35VS",
+      "costUsd": 0,
+      "providerHttpStatus": 400,
+      "error": "COMPLETED"
+    },
+    {
+      "host": "kling.ai",
+      "brands": [
+        "Kling"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG1PQYRANFX5X196M65SNH",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "F",
+      "score": 10
+    },
+    {
+      "host": "minimax.io",
+      "brands": [
+        "MiniMax"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG1V32TKCVZWQXF8X58RWD",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "D",
+      "score": 45
+    },
+    {
+      "host": "mrscraper.com",
+      "brands": [
+        "MrScraper"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG20021X2HDVB9N59XSASN",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "F",
+      "score": 30
+    },
+    {
+      "host": "octen.ai",
+      "brands": [
+        "Octen"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG23V0VVK06M75H18DN0HD",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "A",
+      "score": 100
+    },
+    {
+      "host": "peopledatalabs.com",
+      "brands": [
+        "People Data Labs"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG280MMH2MQ0E9M0WN6AJP",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "A",
+      "score": 90
+    },
+    {
+      "host": "ploid.com",
+      "brands": [
+        "Ploid"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG2C6VW14V7VJJHJND23W0",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "C",
+      "score": 75
+    },
+    {
+      "host": "semrush.com",
+      "brands": [
+        "Semrush"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG2GD2RG63HKVM1JZ76WCF",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "D",
+      "score": 55
+    },
+    {
+      "host": "strale.io",
+      "brands": [
+        "Strale"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG2MCZ0KSB9TPG4XQXJK1G",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "F",
+      "score": 35
+    },
+    {
+      "host": "suzanne3d.com",
+      "brands": [
+        "Suzanne"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG2REX90PJ4K128VDHGXDB",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "F",
+      "score": 35
+    },
+    {
+      "host": "tinyfish.ai",
+      "brands": [
+        "TinyFish"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG2WB0YZ164SQV69KT8FBX",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "A",
+      "score": 90
+    },
+    {
+      "host": "tryfundable.ai",
+      "brands": [
+        "Fundable"
+      ],
+      "fronted": false,
+      "outcome": "screened",
+      "runId": "01M2HG2ZYNW34HH06RKZ907HG7",
+      "costUsd": 0.0594,
+      "providerHttpStatus": 200,
+      "grade": "F",
+      "score": 35
+    }
+  ],
+  "unscreenable": [
+    {
+      "provider": "defillama",
+      "providerName": "DefiLlama",
+      "reason": "No documentation host is published, so no counterparty can be named. Not screened and not approved."
+    },
+    {
+      "provider": "sfs",
+      "providerName": "Simple FS",
+      "reason": "No documentation host is published, so no counterparty can be named. Not screened and not approved."
+    },
+    {
+      "provider": "tikhub",
+      "providerName": "TikHub",
+      "reason": "No documentation host is published, so no counterparty can be named. Not screened and not approved."
+    }
+  ],
+  "limitation": "Security-header evidence describes the HTTP response of one host at one moment. It is not a judgement of the vendor, its data quality, or its trustworthiness, and a passing grade is not an approval to spend."
+}

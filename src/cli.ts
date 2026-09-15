@@ -5,6 +5,8 @@ import { discoverInspectAndAudit, executeWithAudit } from './index.js';
 import { runVendorPrescreen } from './vendor-prescreen.js';
 import { checkProvenance } from './provenance.js';
 import { sweepCatalogProvenance } from './catalog-provenance.js';
+import { planCounterpartyScreen } from './counterparty.js';
+import { runCohortScreen } from './cohort-screen.js';
 
 async function main() {
   const args = process.argv.slice(2);
@@ -117,6 +119,56 @@ async function main() {
     return;
   }
 
+  if (command === 'cohort-screen') {
+    if (!args.includes('--confirm-spend')) {
+      console.error(`🛑 Refused: cohort-screen makes one paid Monid call per counterparty. Re-run with --confirm-spend.`);
+      process.exitCode = 2;
+      return;
+    }
+    const { readFileSync, writeFileSync } = await import('node:fs');
+    const planIndex = args.indexOf('--plan');
+    const planPath = planIndex >= 0 ? args[planIndex + 1] : 'evidence/counterparty-plan.json';
+    const maxIndex = args.indexOf('--max-total');
+    const maxTotalUsd = maxIndex >= 0 ? Number(args[maxIndex + 1]) : 2;
+    const limitIndex = args.indexOf('--limit');
+    const outIndex = args.indexOf('--out');
+    const out = outIndex >= 0 ? args[outIndex + 1] : undefined;
+
+    // Re-derive the plan from the provenance snapshot when asked, so the paid
+    // set always traces back to measured evidence rather than a stale file.
+    const fromIndex = args.indexOf('--from-provenance');
+    const plan = fromIndex >= 0
+      ? planCounterpartyScreen(
+          JSON.parse(readFileSync(args[fromIndex + 1], 'utf8')).findings,
+          0.0594
+        )
+      : JSON.parse(readFileSync(planPath, 'utf8'));
+
+    const client = new MonidClient();
+    const report = await runCohortScreen(client, plan, {
+      confirmSpend: true,
+      maxTotalUsd,
+      ...(limitIndex >= 0 ? { limit: Number(args[limitIndex + 1]) } : {}),
+      onProgress: msg => console.error(`   ${msg}`)
+    });
+    const json = JSON.stringify(report, null, 2);
+    if (out) {
+      writeFileSync(out, json + '\n');
+      console.log(`Wrote ${out}`);
+    }
+    console.table([{
+      Attempted: report.attempted,
+      Screened: report.screened,
+      Failed: report.failed,
+      'Brands covered': report.brandsCovered,
+      Spent: `$${report.spentUsd.toFixed(4)}`,
+      Ceiling: `$${report.maxTotalUsd.toFixed(2)}`
+    }]);
+    console.log(`Grades: ${JSON.stringify(report.gradeDistribution)}`);
+    console.log(`\n${report.limitation}\n`);
+    return;
+  }
+
   if (command === 'consume') {
     if (!args.includes('--confirm-spend')) {
       console.error(`🛑 Refused: consume can spend Monid balance. Re-run with --confirm-spend.`);
@@ -158,6 +210,7 @@ async function main() {
   console.log(`  tool-audit audit <provider:/endpoint>`);
   console.log(`  tool-audit provenance <provider:/endpoint>`);
   console.log(`  tool-audit catalog-provenance [--out evidence/catalog-provenance.json]`);
+  console.log(`  tool-audit cohort-screen --confirm-spend [--max-total 2] [--limit N] [--out FILE]`);
   console.log(`  tool-audit discover-audit "<query>"`);
   console.log(`  tool-audit consume "<query>" --input '<json>' --confirm-spend`);
   console.log(`  tool-audit prescreen <https-url> --max-total 0.24 --confirm-spend`);
