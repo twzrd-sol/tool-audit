@@ -11,6 +11,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 const prov = JSON.parse(readFileSync('evidence/catalog-provenance.json', 'utf8'));
 const plan = JSON.parse(readFileSync('evidence/counterparty-plan.json', 'utf8'));
 const screen = JSON.parse(readFileSync('evidence/counterparty-screen.json', 'utf8'));
+const pb = JSON.parse(readFileSync('evidence/parse-bot-headers.json', 'utf8'));
 const blind = JSON.parse(readFileSync('evidence/selection-blindness.json', 'utf8'));
 const OUT = process.argv[2] || 'pages/counterparty.html';
 
@@ -126,6 +127,8 @@ const html = `<!doctype html>
 ${byGrade.map(([g, n]) => `      <div class="bar"><span class="k g${g}">${g}</span><span class="t g${g}-b" style="width:${(100 * n / maxGrade).toFixed(1)}%"></span><span class="muted">${n}</span></div>`).join('\n')}
     </div>
     <p><strong>${dOrF} of ${screen.screened}</strong> — ${pct(dOrF, screen.screened)} — grade D or F on security headers. These are the hosts the listings document, and so the hosts a screen should target.${parseBot ? ` <code>${esc(front.domain)}</code>, the host behind ${front.count} brand names, grades <strong>${esc(parseBot.grade)}</strong>.` : ''}</p>
+
+    <div class="limit"><strong>What the ${esc(pb.grade)} on <code>${esc(pb.host)}</code> actually is.</strong> The cohort run kept only a grade letter, which is not enough to say anything fair about a host standing behind ${front.count} listings, so we re-screened that one host and kept the detail. <code>${esc(pb.screenedUrl)}</code> returned ${esc(String(pb.providerHttpStatus))} with ${pb.presentHeaders.length} security headers present (${pb.presentHeaders.map(esc).join(', ')}) and ${pb.missingHeaders.length} missing: <strong>${pb.missingHeaders.map(esc).join(', ')}</strong>. That single absence is the whole of the ${esc(pb.grade)}. It is a real gap and it is not a bad posture.</div>
 
     <div class="scroll"><table>
       <thead><tr><th>Counterparty</th><th>Grade</th><th class="num-cell">Score</th><th class="num-cell">Brands</th></tr></thead>

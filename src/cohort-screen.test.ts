@@ -169,3 +169,27 @@ test('every result records the exact URL that was screened', async () => {
   );
   assert.equal(report.results[0].screenedUrl, 'https://a.com');
 });
+
+test("the missing-header list is read under the name the tool actually uses", async () => {
+  const run = (out: Record<string, unknown>): MonidRun => ({
+    runId: 'r1', provider: 'api.strale.io', endpoint: '/x402/header-security-check',
+    status: 'COMPLETED', output: out, providerResponse: { httpStatus: 200 },
+    cost: { value: 0.0594, currency: 'USD' }
+  } as MonidRun);
+  // The tool returns `missing`. Reading only `missingHeaders` dropped it from
+  // all 30 results of the 2026-09-15 run.
+  // The live tool returns objects: { header, severity, recommendation }.
+  const c0 = client({ 'https://a.com': run({ grade: 'C', score: 75, missing: [
+    { header: 'content-security-policy', severity: 'high', recommendation: 'Add CSP' }
+  ] }) });
+  const r0 = await runCohortScreen(c0, plan([{ host: 'a.com', brands: ['A'] }]), { confirmSpend: true, maxTotalUsd: 1 });
+  assert.deepEqual(r0.results[0].missingHeaders, ['content-security-policy']);
+
+  const c1 = client({ 'https://a.com': run({ grade: 'F', score: 35, missing: ['csp', 'hsts'] }) });
+  const r1 = await runCohortScreen(c1, plan([{ host: 'a.com', brands: ['A'] }]), { confirmSpend: true, maxTotalUsd: 1 });
+  assert.deepEqual(r1.results[0].missingHeaders, ['csp', 'hsts']);
+
+  const c2 = client({ 'https://a.com': run({ grade: 'F', score: 35, missingHeaders: ['csp'] }) });
+  const r2 = await runCohortScreen(c2, plan([{ host: 'a.com', brands: ['A'] }]), { confirmSpend: true, maxTotalUsd: 1 });
+  assert.deepEqual(r2.results[0].missingHeaders, ['csp']);
+});

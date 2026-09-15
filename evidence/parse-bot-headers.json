@@ -1,0 +1,24 @@
+{
+  "schema": "tool-audit.single-host-screen.v1",
+  "why": "The 2026-09-15 cohort run read the wrong output field and kept no missing-header list for any host. parse.bot is the documentation host behind 29 listings, so all the evidence said of it was one grade letter. This re-screens that one host with the parser corrected.",
+  "host": "parse.bot",
+  "screenedUrl": "https://parse.bot",
+  "runId": "01M2K8VA4HW8ZNFXE5H52Q8E0H",
+  "costUsd": 0.0594,
+  "providerHttpStatus": 200,
+  "grade": "C",
+  "score": 75,
+  "missingHeaders": [
+    "content-security-policy"
+  ],
+  "presentHeaders": [
+    "strict-transport-security",
+    "x-frame-options",
+    "x-content-type-options",
+    "referrer-policy",
+    "permissions-policy",
+    "x-xss-protection"
+  ],
+  "server": "cloudflare",
+  "limitation": "Security-header evidence describes one HTTP response from one host at one moment. It is not a judgement of the vendor, its data quality, or its trustworthiness, and a passing grade is not an approval to spend."
+}

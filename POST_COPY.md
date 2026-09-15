@@ -8,7 +8,7 @@ line, and Instagram/TikTok caption. Do not put it only in a reply.
 ```text
 Vendorapp Startup: $149/month for 200 AI pre-screens.
 Monid, 62 providers resolved and 30 counterparties screened: $1.7820.
-Total measured campaign spend across both runs: $2.0214.
+Total measured campaign spend: $2.0808.
 ```
 
 Breakdown, if asked:
@@ -18,7 +18,8 @@ Breakdown, if asked:
 | v1 three-call vendor pre-screen chain | 2026-09-11 | $0.2385 |
 | v1 earlier failed attempt (`01M272SPTD953E3M0WVHF2WSN2`) | 2026-09-11 | $0.0009 |
 | v2 counterparty screen, 30 hosts covering 58 brands | 2026-09-15 | $1.7820 |
-| **Total** | | **$2.0214** |
+| v2 parse.bot re-screen, missing-header detail | 2026-09-15 | $0.0594 |
+| **Total** | | **$2.0808** |
 
 Provenance sweep, 409 endpoints surfaced and 62 providers inspected, cost
 **$0.00** — discovery and inspection settle nothing. Workspace balance $22.46
@@ -89,7 +90,7 @@ $1.7820 across 30 of them, one having answered HTTP 400 for $0. 16 of those 30
 grade D or F on security headers — including context.dev and strale.io, the two
 suppliers our own v1 demo paid.
 
-Total measured spend across both runs: $2.0214.
+Total measured spend: $2.0808.
 
 Links and the three lines below. Happy to hand over the per-provider
 provenance data if it's useful to you — it's a map of your own marketplace's
@@ -128,4 +129,4 @@ Register each URL within 24 hours. At least one registered post is required.
 
 Team `tool-audit`, member `TWZRD`, X handle `@twzrd_xyz`, Monid account
 `zohaibmohd@utexas.edu`. Registered target is Vendorapp's published $149/month
-offer. Report **$2.0214** as the measured campaign cost.
+offer. Report **$2.0808** as the measured campaign cost.

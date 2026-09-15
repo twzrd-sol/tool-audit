@@ -19,7 +19,7 @@ first submission.
 
 The hackathon was then extended and $20 of Monid credit was granted, so a
 second measured run followed on 2026-09-15 at **$1.7820** — see the update
-below. **Total measured campaign spend across both runs: $2.0214.** Workspace
+below. **Total measured campaign spend: $2.0808.** Workspace
 balance $22.46 before, $20.68 after; receipts and balance agree.
 
 ## Update, 2026-09-15: who are you actually paying?
@@ -262,7 +262,8 @@ node dist/cli.js audit api.strale.io:/x402/header-security-check
 This command makes three paid calls. It first checks the complete advertised
 per-call cost against a $0.24 ceiling. The measured $0.2385 chain is the final
 paid run of the v1 pre-screen; its subtotal is $0.2394. The 2026-09-15
-counterparty screen added $1.7820, for a campaign total of $2.0214.
+counterparty screen added $1.7820, and a $0.0594 single-host re-screen
+followed, for a campaign total of $2.0808.
 
 ```bash
 node dist/cli.js prescreen https://monid.ai \

@@ -77,9 +77,25 @@ function summarize(run: MonidRun): Pick<CohortScreenResult, 'grade' | 'score' | 
   const output = (run.output && typeof run.output === 'object' ? run.output : {}) as Record<string, unknown>;
   const grade = typeof output.grade === 'string' ? output.grade : undefined;
   const score = typeof output.score === 'number' ? output.score : undefined;
-  const missing = Array.isArray(output.missingHeaders)
-    ? output.missingHeaders.filter((h): h is string => typeof h === 'string')
-    : undefined;
+  // The header tool names this field `missing`, and fills it with objects of
+  // the shape { header, severity, recommendation } rather than strings. The
+  // 2026-09-15 run read `missingHeaders` and then kept only strings, so it
+  // retained nothing for any host and its grades could not be re-derived.
+  // Both names and both shapes are handled now.
+  const rawMissing = Array.isArray(output.missing)
+    ? output.missing
+    : Array.isArray(output.missingHeaders)
+      ? output.missingHeaders
+      : undefined;
+  const missing = rawMissing
+    ?.map(h => {
+      if (typeof h === 'string') return h;
+      if (h && typeof h === 'object' && typeof (h as { header?: unknown }).header === 'string') {
+        return (h as { header: string }).header;
+      }
+      return undefined;
+    })
+    .filter((h): h is string => typeof h === 'string');
   return {
     ...(grade === undefined ? {} : { grade }),
     ...(score === undefined ? {} : { score }),
