@@ -131,12 +131,27 @@ balance. None of it was bought over x402, so nothing here demonstrates an agent
 buying a counterparty screen without an account.
 
 The x402 rail itself is proven separately in the companion repo `monid-x402`:
-a live 402, a signed EIP-3009 authorization, and a settled **$0.01 USDC payment
-on Base** on 2026-09-12 — transaction `0x4a87dcf1…`, block 51197570,
-`signer_invocation_count: 1` — alongside refuse packets that end at
-`signer_invocation_count: 0` without ever constructing a signer. That payment
-bought a `context.dev` scrape. Receipt:
-<https://twzrd-sol.github.io/monid-x402/paid.json>
+a live 402, a signed EIP-3009 authorization, and settled **$0.01 USDC payments
+on Base** — the first on 2026-09-12, transaction `0x4a87dcf1…`, block 51197570.
+Receipt: <https://twzrd-sol.github.io/monid-x402/paid.json>
+
+The clearest run is the pair on 2026-09-15, three minutes apart against the
+same seller:
+
+| Time (UTC) | Outcome | Signer invocations | Spent |
+| --- | --- | ---: | ---: |
+| 19:37:10 | refused, `twzrd_wash_unknown` | 0 | $0.00 |
+| 19:40:40 | paid, tx `0x3d93b3b7…`, block 51355947 | 1 | $0.01 |
+
+The gate refused first. The seller's merchant card had renamed the field the
+gate reads for wash confidence, so coverage came back unknown and the gate
+treated unknown as refuse rather than as clean. Once the gate read the new
+field name the same payment went through. Both packets are on disk, and the
+payer wallet holds **no ETH at all** — under EIP-3009 the facilitator submits
+and pays gas, so an agent needs only the stablecoin.
+
+That is the refusing half and the paying half of the same gate, on live money,
+minutes apart.
 
 The `counterparty-provenance` SKU defined there is priced, schema'd and costed
 against measured COGS. It has not been sold. No agent has bought a counterparty
