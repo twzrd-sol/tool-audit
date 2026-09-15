@@ -147,3 +147,25 @@ test('a passing grade is never phrased as approval', async () => {
   );
   assert.match(report.limitation, /not an approval to spend/);
 });
+
+test('an unusable ceiling is refused before anything is inspected', async () => {
+  for (const bad of [NaN, 0, -1, Infinity]) {
+    const c = client({ 'https://a.com': ok('r1', 'A') });
+    await assert.rejects(
+      () => runCohortScreen(c, plan([{ host: 'a.com', brands: ['A'] }]), { confirmSpend: true, maxTotalUsd: bad as number }),
+      (e: unknown) => e instanceof CohortBudgetError
+    );
+    // NaN compares false against every `>`, so without the guard both the
+    // upfront refusal and the per-call check would pass and money would move.
+    assert.equal(c.calls.length, 0, `ceiling ${bad} must not spend`);
+  }
+});
+
+test('every result records the exact URL that was screened', async () => {
+  const c = client({ 'https://a.com': ok('r1', 'A') });
+  const report = await runCohortScreen(
+    c, plan([{ host: 'a.com', brands: ['A'] }]),
+    { confirmSpend: true, maxTotalUsd: 1 }
+  );
+  assert.equal(report.results[0].screenedUrl, 'https://a.com');
+});

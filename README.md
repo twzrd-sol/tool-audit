@@ -42,6 +42,11 @@ endpoints across 62 providers**, and we inspected **one endpoint per provider,
 | No documentation URL at all | 3 | 5% |
 | Carrying `verified` while not documenting on their own host | **32** | 52% |
 
+Read that last row with its base rate: `verified` is on **58 of the 62**
+listings, 94%, including 26 of the 29 that do document on their own host. The
+tag is not a discriminator. It appears either side of the split, so it cannot
+tell an agent which side a listing is on.
+
 Of the 30 mismatches, **29 document at a single host**, `parse.bot`. An agent
 selecting Nasdaq, Crunchbase, G2, Trustpilot, Zillow, Indeed, Y Combinator,
 Yahoo Finance, Capterra or Wellfound by name gets a listing documented at the
@@ -50,9 +55,10 @@ should be pointed at. It is evidence about who stands behind the endpoint, not
 proof of who operates it or receives the payment.
 
 This is not an allegation of deception. `parse.bot` is named openly in each
-listing's own documentation URL and the endpoints return real data. The narrow
-point is that `providerName` and `verified` are what an agent sees when it
-selects, and neither carries this fact.
+listing's own documentation URL. We called none of these endpoints, so we make
+no claim about the data they return. The narrow point is that `providerName`
+and `verified` are what an agent sees when it selects, and neither carries this
+fact.
 
 ### Knowing the counterparty halves the paid work
 
@@ -81,7 +87,9 @@ Security-header grades across those 30 documentation hosts:
 **16 of 30 — 53% — grade D or F.** `parse.bot`, the host behind 29 brand
 names, grades C.
 `context.dev` and `strale.io` — the two suppliers the frozen v1 demo itself
-paid — both grade **F**.
+paid — both grade **F**. Each host was screened at its registrable domain, so
+for Strale that is `https://strale.io`, not the `api.strale.io` host that
+actually served the v1 call.
 
 Full write-up: <https://twzrd-sol.github.io/tool-audit/counterparty.html>
 

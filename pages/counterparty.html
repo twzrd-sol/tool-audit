@@ -69,8 +69,8 @@
     <h2>29 brands, one counterparty</h2>
     <p>Of the 30 mismatches, <strong>29</strong> document at a single host: <code>parse.bot</code>. An agent picking any of these by name gets a listing documented in the same place. We call that host the listing's <em>counterparty</em> — the host a screen should be pointed at. It is evidence about who stands behind the endpoint, not proof of who operates it or receives the payment.</p>
     <div class="card"><p class="muted" style="margin:0;font-size:14px">AAA Gas Prices · AccuWeather · Artificial Analysis · Built In · Capterra · Clutch · Crunchbase · Finviz · G2 · GetApp · Homes.com · IQAir · Idealist · Indeed · LMArena · Levels.fyi · LoopNet · MarketBeat · Nasdaq · SECForm4 · StockAnalysis · The Companies API · Trustpilot · Weather Underground · Web3 Career · Wellfound · Y Combinator · Yahoo Finance · Zillow</p></div>
-    <p class="muted" style="font-size:14px">A further 3 listings publish no documentation URL at all. 32 of the 62 carry <code>verified</code> while not documenting on their own host.</p>
-    <div class="limit"><strong>This is not an allegation of deception.</strong> parse.bot is named openly in each listing's own documentation URL, and the endpoints return real data. The narrow point is that <code>providerName</code> and <code>verified</code> are what an agent sees when it selects, and neither of them carries this fact.</div>
+    <p class="muted" style="font-size:14px">A further 3 listings publish no documentation URL at all. 32 of the 62 carry <code>verified</code> while not documenting on their own host — but read that with its base rate: <strong>58 of the 62 listings carry <code>verified</code> at all</strong> (94%), including 26 of the 29 that do document on their own host. The tag sits on both sides of the split, so it cannot tell an agent which side it is looking at.</p>
+    <div class="limit"><strong>This is not an allegation of deception.</strong> parse.bot is named openly in each listing's own documentation URL. We called none of these endpoints, so we make no claim about the data they return. The narrow point is that <code>providerName</code> and <code>verified</code> are what an agent sees when it selects, and neither of them carries this fact.</div>
 
     <h2>Knowing the counterparty halves the bill</h2>
     <p>A cohort screen that bills once per listed brand pays 29 times for one host — and points its evidence at the brand's own website instead of the host its own listing documents. Resolving counterparties first fixes the target and the price at once.</p>
@@ -81,7 +81,7 @@
     </div>
 
     <h2>What the paid screen found</h2>
-    <p>30 hosts screened, covering 58 listed brands, for <strong>$1.7820</strong> against a $2.0000 ceiling.</p>
+    <p>30 hosts screened, covering 58 listed brands, for <strong>$1.7820</strong> against a $2.0000 ceiling. Each host was screened at its registrable domain, <code>https://&lt;host&gt;</code> — so a subdomain that serves the API, such as <code>api.strale.io</code>, is not what earned the grade.</p>
     <div class="card">
       <div class="bar"><span class="k gA">A</span><span class="t gA-b" style="width:54.5%"></span><span class="muted">6</span></div>
       <div class="bar"><span class="k gB">B</span><span class="t gB-b" style="width:9.1%"></span><span class="muted">1</span></div>

@@ -27,6 +27,8 @@ export interface CohortScreenResult {
   host: string;
   brands: string[];
   fronted: boolean;
+  /** The exact URL submitted to the header check. Evidence must say what was measured. */
+  screenedUrl?: string;
   outcome: 'screened' | 'failed';
   runId?: string;
   costUsd?: number;
@@ -98,6 +100,14 @@ export async function runCohortScreen(
   if (!options.confirmSpend) {
     throw new CohortBudgetError('Cohort screen makes paid Monid calls. Re-run with --confirm-spend.');
   }
+  // An unusable ceiling is not an absent ceiling. NaN compares false against
+  // every `>` below, which would silently disable both the upfront refusal and
+  // the per-call guard, so it is rejected before anything is inspected.
+  if (!Number.isFinite(options.maxTotalUsd) || options.maxTotalUsd <= 0) {
+    throw new CohortBudgetError(
+      `Refused before spending: maxTotalUsd must be a positive finite amount, received ${options.maxTotalUsd}.`
+    );
+  }
   const progress = options.onProgress ?? (() => {});
 
   // Price is re-read live. A plan built minutes ago is not a price lock.
@@ -131,15 +141,17 @@ export async function runCohortScreen(
       progress(`stopping before ${target.host}: next call would exceed the ceiling`);
       break;
     }
-    const base: Pick<CohortScreenResult, 'host' | 'brands' | 'fronted'> = {
+    const base: Pick<CohortScreenResult, 'host' | 'brands' | 'fronted' | 'screenedUrl'> = {
       host: target.host,
       brands: target.brands,
-      fronted: target.fronted
+      fronted: target.fronted,
+      screenedUrl: `https://${target.host}`
     };
     try {
+      const screenedUrl = `https://${target.host}`;
       const run = await client.run(
         HEADER_CHECK_TOOL,
-        { queryParams: { url: `https://${target.host}` } },
+        { queryParams: { url: screenedUrl } },
         { wait: true }
       );
       const costUsd = getUsdCost(run);

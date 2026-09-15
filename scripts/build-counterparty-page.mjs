@@ -22,6 +22,8 @@ const maxGrade = Math.max(...byGrade.map(([, n]) => n), 1);
 const dOrF = (screen.gradeDistribution.D || 0) + (screen.gradeDistribution.F || 0);
 const parseBot = screened.find(r => r.host === 'parse.bot');
 const front = prov.fronts[0];
+const verifiedTotal = prov.findings.filter(f => f.verifiedTag).length;
+const verifiedFirstParty = prov.findings.filter(f => f.verifiedTag && f.classification === 'first_party_doc_host').length;
 const failed = screen.results.filter(r => r.outcome === 'failed');
 
 const rows = [...screened]
@@ -104,8 +106,8 @@ const html = `<!doctype html>
     <h2>${front.count} brands, one counterparty</h2>
     <p>Of the ${prov.thirdPartyDocHost} mismatches, <strong>${front.count}</strong> document at a single host: <code>${esc(front.domain)}</code>. An agent picking any of these by name gets a listing documented in the same place. We call that host the listing's <em>counterparty</em> — the host a screen should be pointed at. It is evidence about who stands behind the endpoint, not proof of who operates it or receives the payment.</p>
     <div class="card"><p class="muted" style="margin:0;font-size:14px">${front.brands.map(esc).join(' · ')}</p></div>
-    <p class="muted" style="font-size:14px">A further ${prov.undocumented} listings publish no documentation URL at all. ${prov.verifiedButNotFirstParty} of the ${prov.total} carry <code>verified</code> while not documenting on their own host.</p>
-    <div class="limit"><strong>This is not an allegation of deception.</strong> ${esc(front.domain)} is named openly in each listing's own documentation URL, and the endpoints return real data. The narrow point is that <code>providerName</code> and <code>verified</code> are what an agent sees when it selects, and neither of them carries this fact.</div>
+    <p class="muted" style="font-size:14px">A further ${prov.undocumented} listings publish no documentation URL at all. ${prov.verifiedButNotFirstParty} of the ${prov.total} carry <code>verified</code> while not documenting on their own host — but read that with its base rate: <strong>${verifiedTotal} of the ${prov.total} listings carry <code>verified</code> at all</strong> (${pct(verifiedTotal, prov.total)}), including ${verifiedFirstParty} of the ${prov.firstPartyDocHost} that do document on their own host. The tag sits on both sides of the split, so it cannot tell an agent which side it is looking at.</p>
+    <div class="limit"><strong>This is not an allegation of deception.</strong> ${esc(front.domain)} is named openly in each listing's own documentation URL. We called none of these endpoints, so we make no claim about the data they return. The narrow point is that <code>providerName</code> and <code>verified</code> are what an agent sees when it selects, and neither of them carries this fact.</div>
 
     <h2>Knowing the counterparty halves the bill</h2>
     <p>A cohort screen that bills once per listed brand pays ${front.count} times for one host — and points its evidence at the brand's own website instead of the host its own listing documents. Resolving counterparties first fixes the target and the price at once.</p>
@@ -116,7 +118,7 @@ const html = `<!doctype html>
     </div>
 
     <h2>What the paid screen found</h2>
-    <p>${screen.screened} hosts screened, covering ${screen.brandsCovered} listed brands, for <strong>${usd(screen.spentUsd)}</strong> against a ${usd(screen.maxTotalUsd)} ceiling.</p>
+    <p>${screen.screened} hosts screened, covering ${screen.brandsCovered} listed brands, for <strong>${usd(screen.spentUsd)}</strong> against a ${usd(screen.maxTotalUsd)} ceiling. Each host was screened at its registrable domain, <code>https://&lt;host&gt;</code> — so a subdomain that serves the API, such as <code>api.strale.io</code>, is not what earned the grade.</p>
     <div class="card">
 ${byGrade.map(([g, n]) => `      <div class="bar"><span class="k g${g}">${g}</span><span class="t g${g}-b" style="width:${(100 * n / maxGrade).toFixed(1)}%"></span><span class="muted">${n}</span></div>`).join('\n')}
     </div>

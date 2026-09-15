@@ -34,7 +34,7 @@ Before an agent pays a vendor, the real question isn't what the check costs. It'
 
 We asked that of Monid's own catalog. 25 free discovery queries surfaced 409 endpoints across 62 providers, and we read the documentation host on one listing per provider. Cost: $0.00.
 
-30 of 62 document at a host that doesn't match the brand they advertise. 29 of those are the same host. 32 carry a "verified" tag while not documenting on their own domain.
+30 of 62 document at a host that doesn't match the brand they advertise. 29 of those are the same host. And the "verified" tag can't help you tell: it's on 58 of the 62 listings, either side of that split.
 
 Knowing the counterparty then halved the paid work: 59 listings collapse to 31 documentation hosts. Screening those planned $1.84 against $3.50 per brand name; the run spent $1.78 across 30 of them, one having answered HTTP 400 for $0. 16 of the 30 grade D or F on security headers.
 
@@ -73,10 +73,14 @@ nothing: 25 seed queries surfaced 409 endpoints across 62 providers, and we
 read the documentation host on one listing per provider. 30 document at a host
 that doesn't match the brand they assert, 29 of those at parse.bot, and 3
 publish no docs at all.
-32 of the 62 carry `verified` while not documenting on their own host. That's
-a metadata observation, not an accusation — parse.bot is named openly in each
-listing's own docUrl. The point is that providerName and the verified tag are
-what an agent sees at selection time, and neither carries it.
+32 of the 62 carry `verified` while not documenting on their own host — though
+the honest way to read that is the base rate: `verified` is on 58 of the 62
+listings, including 26 of the 29 that do document on their own host, so the tag
+sits either side of the split and cannot separate them. That's a metadata
+observation, not an accusation — parse.bot is named openly in each listing's
+own docUrl, and we called none of those endpoints, so we say nothing about the
+data they return. The point is that providerName and the verified tag are what
+an agent sees at selection time, and neither carries it.
 
 That finding then paid for itself: deduplicating 59 listings onto 31
 documentation hosts planned $1.8414 against $3.5046 per brand name, on work

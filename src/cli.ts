@@ -130,6 +130,11 @@ async function main() {
     const planPath = planIndex >= 0 ? args[planIndex + 1] : 'evidence/counterparty-plan.json';
     const maxIndex = args.indexOf('--max-total');
     const maxTotalUsd = maxIndex >= 0 ? Number(args[maxIndex + 1]) : 2;
+    if (!Number.isFinite(maxTotalUsd) || maxTotalUsd <= 0) {
+      console.error(`🛑 Refused: --max-total must be a positive number, got '${args[maxIndex + 1]}'.`);
+      process.exitCode = 2;
+      return;
+    }
     const limitIndex = args.indexOf('--limit');
     const outIndex = args.indexOf('--out');
     const out = outIndex >= 0 ? args[outIndex + 1] : undefined;
