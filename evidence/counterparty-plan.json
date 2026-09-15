@@ -271,5 +271,5 @@
   "naiveCostUsd": 3.5046,
   "dedupedCostUsd": 1.8414,
   "savedUsd": 1.6632,
-  "note": "Screening targets are the hosts that answer, not the brands that are listed. Undocumented listings are excluded from the paid set and remain unevaluated, which is not the same as clean."
+  "note": "Screening targets are the hosts the listings document, not the brands that are listed. Undocumented listings are excluded from the paid set and remain unevaluated, which is not the same as clean."
 }
