@@ -56,7 +56,8 @@
     "test": "npm run build && node --test dist/audit.test.js dist/evidence.test.js dist/monid.test.js dist/vendor-prescreen.test.js && node scripts/verify-snapshot.mjs",
     "verify:snapshot": "node scripts/verify-snapshot.mjs",
     "verify:evidence": "npm run build && node scripts/verify-evidence.mjs",
-    "pack:check": "npm pack --dry-run"
+    "pack:check": "npm pack --dry-run",
+    "build:page": "node scripts/build-counterparty-page.mjs"
   },
   "keywords": [
     "monid",

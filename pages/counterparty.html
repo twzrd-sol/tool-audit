@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>tool-audit — who are you actually paying?</title>
+  <meta name="description" content="Measured 2026-09-15: 30 of 62 Monid providers document at a host that does not match the brand they assert. 29 of them at parse.bot. Preflight cost $0.00; the paid counterparty screen cost $1.7820.">
+  <link rel="canonical" href="https://twzrd-sol.github.io/tool-audit/counterparty.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="30 of 62 vendors are not who the name says">
+  <meta property="og:description" content="Free preflight named the real counterparty behind every listing. 29 brands resolve to one host. The paid screen then cost $1.7820 instead of $3.5046.">
+  <meta property="og:url" content="https://twzrd-sol.github.io/tool-audit/counterparty.html">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      --bg: #101114; --card: #1a1c21; --ink: #f4f1ea; --muted: #b7b1a4;
+      --line: #2b2e36; --amber: #d7a04a; --amber-bg: #2a2214;
+      --red: #d76a5a; --green: #7fa86b;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 16px/1.45 "Liberation Sans", FreeSans, sans-serif; background: var(--bg); color: var(--ink); }
+    main { max-width: 880px; margin: 0 auto; padding: 32px 20px 64px; }
+    .kicker { color: var(--amber); letter-spacing: 0.12em; font-size: 12px; text-transform: uppercase; }
+    h1 { font-size: clamp(27px, 5vw, 42px); line-height: 1.12; margin: 8px 0 16px; }
+    h2 { font-size: 20px; margin: 40px 0 12px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+    .muted { color: var(--muted); }
+    .lede { font-size: 18px; }
+    .grid { display: grid; gap: 12px; }
+    @media (min-width: 720px) { .grid.three { grid-template-columns: repeat(3, 1fr); } .grid.two { grid-template-columns: 1fr 1fr; } }
+    .stat { font-size: clamp(30px, 5vw, 42px); font-weight: 700; line-height: 1; }
+    .stat.amber { color: var(--amber); }
+    .stat.red { color: var(--red); }
+    .label { color: var(--muted); font-size: 13px; margin-top: 6px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .scroll { overflow-x: auto; }
+    th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
+    tr.hi td { background: var(--amber-bg); }
+    .num-cell { text-align: right; font-variant-numeric: tabular-nums; }
+    .g { font-weight: 700; text-align: center; width: 48px; }
+    .gA, .gB { color: var(--green); }
+    .gD { color: var(--amber); }
+    .gF { color: var(--red); }
+    .tag { font-size: 11px; border: 1px solid var(--amber); color: var(--amber); border-radius: 999px; padding: 1px 7px; margin-left: 6px; }
+    .bar { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+    .bar .k { width: 20px; font-weight: 700; }
+    .bar .t { height: 20px; border-radius: 4px; background: var(--amber); min-width: 3px; }
+    .bar .gA-b { background: var(--green); } .bar .gB-b { background: var(--green); }
+    .bar .gF-b { background: var(--red); }
+    .limit { border-left: 3px solid var(--amber); padding: 12px 16px; background: var(--amber-bg); border-radius: 0 8px 8px 0; margin: 12px 0; }
+    code { font-size: 13px; }
+    a { color: var(--amber); }
+    footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="kicker">Measured 2026-09-15 · reproducible · not a live query</p>
+    <h1>Our first pass asked what a vendor check costs. The question before that one is who you are actually paying.</h1>
+    <p class="lede muted">A Monid discovery result gives an agent a brand name and, often, a <code>verified</code> tag. Neither of those names the operator that answers the call. The one operator signal published per endpoint is its documentation URL — so we read all of them.</p>
+
+    <div class="grid three" style="margin:28px 0">
+      <div class="card"><div class="stat">62</div><div class="label">providers swept<br>409 endpoints</div></div>
+      <div class="card"><div class="stat amber">30</div><div class="label">document at a host that does not match the brand asserted (48%)</div></div>
+      <div class="card"><div class="stat">$0.00</div><div class="label">cost of the entire sweep — discovery and inspection settle nothing</div></div>
+    </div>
+
+    <h2>29 brands, one counterparty</h2>
+    <p>Of the 30 mismatches, <strong>29</strong> resolve to a single host: <code>parse.bot</code>. An agent picking any of these by name is buying from the same place.</p>
+    <div class="card"><p class="muted" style="margin:0;font-size:14px">AAA Gas Prices · AccuWeather · Artificial Analysis · Built In · Capterra · Clutch · Crunchbase · Finviz · G2 · GetApp · Homes.com · IQAir · Idealist · Indeed · LMArena · Levels.fyi · LoopNet · MarketBeat · Nasdaq · SECForm4 · StockAnalysis · The Companies API · Trustpilot · Weather Underground · Web3 Career · Wellfound · Y Combinator · Yahoo Finance · Zillow</p></div>
+    <p class="muted" style="font-size:14px">A further 3 listings publish no documentation URL at all. 32 of the 62 carry <code>verified</code> while not documenting on their own host.</p>
+    <div class="limit"><strong>This is not an allegation of deception.</strong> parse.bot is named openly in each listing's own documentation URL, and the endpoints return real data. The narrow point is that <code>providerName</code> and <code>verified</code> are what an agent sees when it selects, and neither of them carries this fact.</div>
+
+    <h2>Knowing the counterparty halves the bill</h2>
+    <p>A cohort screen that bills once per listed brand pays 29 times for one host — and points its evidence at the brand's own website instead of the party that answers. Resolving counterparties first fixes the target and the price at once.</p>
+    <div class="grid three">
+      <div class="card"><div class="stat">59</div><div class="label">screenable listings</div></div>
+      <div class="card"><div class="stat amber">31</div><div class="label">distinct hosts that answer</div></div>
+      <div class="card"><div class="stat">−47%</div><div class="label">$3.5046 → $1.8414</div></div>
+    </div>
+
+    <h2>What the paid screen found</h2>
+    <p>30 hosts screened, covering 58 listed brands, for <strong>$1.7820</strong> against a $2.0000 ceiling.</p>
+    <div class="card">
+      <div class="bar"><span class="k gA">A</span><span class="t gA-b" style="width:54.5%"></span><span class="muted">6</span></div>
+      <div class="bar"><span class="k gB">B</span><span class="t gB-b" style="width:9.1%"></span><span class="muted">1</span></div>
+      <div class="bar"><span class="k gC">C</span><span class="t gC-b" style="width:63.6%"></span><span class="muted">7</span></div>
+      <div class="bar"><span class="k gD">D</span><span class="t gD-b" style="width:45.5%"></span><span class="muted">5</span></div>
+      <div class="bar"><span class="k gF">F</span><span class="t gF-b" style="width:100.0%"></span><span class="muted">11</span></div>
+    </div>
+    <p><strong>16 of 30</strong> — 53% — grade D or F on security headers. These are the counterparties an agent would pay. <code>parse.bot</code>, the host behind 29 brand names, grades <strong>C</strong>.</p>
+
+    <div class="scroll"><table>
+      <thead><tr><th>Counterparty</th><th>Grade</th><th class="num-cell">Score</th><th class="num-cell">Brands</th></tr></thead>
+      <tbody>
+      <tr class="hi">
+        <td><code>parse.bot</code> <span class="tag">fronted</span></td>
+        <td class="g gC">C</td>
+        <td class="num-cell">75</td>
+        <td class="num-cell">29</td>
+      </tr>
+      <tr>
+        <td><code>ahrefs.com</code></td>
+        <td class="g gA">A</td>
+        <td class="num-cell">90</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>exa.ai</code></td>
+        <td class="g gA">A</td>
+        <td class="num-cell">90</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>firecrawl.dev</code></td>
+        <td class="g gA">A</td>
+        <td class="num-cell">100</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>octen.ai</code></td>
+        <td class="g gA">A</td>
+        <td class="num-cell">100</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>peopledatalabs.com</code></td>
+        <td class="g gA">A</td>
+        <td class="num-cell">90</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>tinyfish.ai</code></td>
+        <td class="g gA">A</td>
+        <td class="num-cell">90</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>apify.com</code></td>
+        <td class="g gB">B</td>
+        <td class="num-cell">80</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>blockrun.ai</code></td>
+        <td class="g gC">C</td>
+        <td class="num-cell">75</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>contactout.com</code></td>
+        <td class="g gC">C</td>
+        <td class="num-cell">70</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>elevenlabs.io</code></td>
+        <td class="g gC">C</td>
+        <td class="num-cell">60</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>google.dev</code></td>
+        <td class="g gC">C</td>
+        <td class="num-cell">70</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>hunter.io</code></td>
+        <td class="g gC">C</td>
+        <td class="num-cell">75</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>ploid.com</code></td>
+        <td class="g gC">C</td>
+        <td class="num-cell">75</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>alibabacloud.com</code></td>
+        <td class="g gD">D</td>
+        <td class="num-cell">45</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>apollo.io</code></td>
+        <td class="g gD">D</td>
+        <td class="num-cell">55</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>clay.com</code></td>
+        <td class="g gD">D</td>
+        <td class="num-cell">45</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>minimax.io</code></td>
+        <td class="g gD">D</td>
+        <td class="num-cell">45</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>semrush.com</code></td>
+        <td class="g gD">D</td>
+        <td class="num-cell">55</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>akta.pro</code></td>
+        <td class="g gF">F</td>
+        <td class="num-cell">35</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>asksurf.ai</code></td>
+        <td class="g gF">F</td>
+        <td class="num-cell">35</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>browserbase.com</code></td>
+        <td class="g gF">F</td>
+        <td class="num-cell">35</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>byteplus.com</code> <span class="tag">fronted</span></td>
+        <td class="g gF">F</td>
+        <td class="num-cell">10</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>context.dev</code></td>
+        <td class="g gF">F</td>
+        <td class="num-cell">35</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>itsgloria.ai</code></td>
+        <td class="g gF">F</td>
+        <td class="num-cell">35</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>kling.ai</code></td>
+        <td class="g gF">F</td>
+        <td class="num-cell">10</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>mrscraper.com</code></td>
+        <td class="g gF">F</td>
+        <td class="num-cell">30</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>strale.io</code></td>
+        <td class="g gF">F</td>
+        <td class="num-cell">35</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>suzanne3d.com</code></td>
+        <td class="g gF">F</td>
+        <td class="num-cell">35</td>
+        <td class="num-cell">1</td>
+      </tr>
+      <tr>
+        <td><code>tryfundable.ai</code></td>
+        <td class="g gF">F</td>
+        <td class="num-cell">35</td>
+        <td class="num-cell">1</td>
+      </tr>
+      </tbody>
+    </table></div>
+    <p class="muted" style="font-size:14px">1 host could not be screened (kadec0.xyz) — answered non-2xx, billed $0.0000, recorded as failed. Unscreened is not a pass.</p>
+    <p class="muted" style="font-size:14px">3 listings were excluded before spending because they publish no host to point evidence at: DefiLlama, Simple FS, TikHub. Unevaluated is not clean.</p>
+
+
+    <h2>What this does and does not establish</h2>
+    <div class="limit">UNABLE_TO_VERIFY_OPERATOR: docUrl identifies who documents this endpoint, not who operates it, receives payment, or holds the data. A matching host is not proof of first-party operation.</div>
+    <div class="limit">Security-header evidence describes the HTTP response of one host at one moment. It is not a judgement of the vendor, its data quality, or its trustworthiness, and a passing grade is not an approval to spend.</div>
+    <p class="muted" style="font-size:14px">Coverage is providers surfaced by the listed queries; not a guaranteed full enumeration. The sweep ran 25 seed queries; re-running it may surface listings this one did not.</p>
+
+    <h2>Reproduce it</h2>
+    <div class="card"><pre style="margin:0;overflow-x:auto"><code>npm ci &amp;&amp; npm run build
+node dist/cli.js catalog-provenance --out evidence/catalog-provenance.json   # free
+node dist/cli.js cohort-screen --confirm-spend --max-total 2                 # paid</code></pre></div>
+    <p class="muted" style="font-size:14px">The first command settles nothing; we read the workspace balance either side and it did not move. The second is the only one that spends, and it refuses before the first call if the live inspected price would breach the ceiling.</p>
+
+    <footer>
+      <p>Built for Monid's 2026 “We Kill” hackathon. Figures on this page are generated from <code>evidence/</code> at build time, not typed in.</p>
+      <p>Provenance swept 2026-09-15T02:53:22.401Z · screen run 2026-09-15T02:59:43.483Z</p>
+    </footer>
+  </main>
+</body>
+</html>
