@@ -6,13 +6,11 @@
  * Nothing is typed in by hand, so the page cannot drift from the receipts.
  * Run `npm run build:page` after any re-measurement.
  */
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 
 const prov = JSON.parse(readFileSync('evidence/catalog-provenance.json', 'utf8'));
 const plan = JSON.parse(readFileSync('evidence/counterparty-plan.json', 'utf8'));
 const screen = JSON.parse(readFileSync('evidence/counterparty-screen.json', 'utf8'));
-const x402Path = 'evidence/x402-first-payment.json';
-const x402 = existsSync(x402Path) ? JSON.parse(readFileSync(x402Path, 'utf8')) : null;
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const usd = n => '$' + Number(n).toFixed(4);
@@ -45,7 +43,7 @@ const html = `<!doctype html>
   <link rel="canonical" href="https://twzrd-sol.github.io/tool-audit/counterparty.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="${front.count} brands, one counterparty: what ${prov.total} vendor listings actually document">
-  <meta property="og:description" content="Free preflight read where every listing documents itself. ${front.count} brands document at one host. Screening those hosts instead of the brand names cost ${usd(screen.spentUsd)} instead of ${usd(plan.naiveCostUsd)}.">
+  <meta property="og:description" content="Free preflight read where every listing documents itself. ${front.count} brands document at one host. Screening ${screen.screened} of those hosts cost ${usd(screen.spentUsd)}, where screening all ${plan.listedBrands} brand names would have cost ${usd(plan.naiveCostUsd)}.">
   <meta property="og:url" content="https://twzrd-sol.github.io/tool-audit/counterparty.html">
   <meta name="twitter:card" content="summary">
   <style>
@@ -94,27 +92,27 @@ const html = `<!doctype html>
 <body>
   <main>
     <p class="kicker">Measured ${esc(screen.screenedAt.slice(0, 10))} · reproducible · not a live query</p>
-    <h1>Our first pass asked what a vendor check costs. The question before that one is who will actually answer the call.</h1>
-    <p class="lede muted">A Monid discovery result gives an agent a brand name and, often, a <code>verified</code> tag. Neither of those names the operator that answers the call. The one operator signal published per endpoint is its documentation URL — so we read all of them.</p>
+    <h1>Our first pass asked what a vendor check costs. The question before that one is who the listing actually points to.</h1>
+    <p class="lede muted">A Monid discovery result gives an agent a brand name and, often, a <code>verified</code> tag. Neither of those names the operator behind the endpoint. The closest thing Monid publishes is the documentation URL on the listing — so we read one per provider, ${prov.total} in all.</p>
 
     <div class="grid three" style="margin:28px 0">
-      <div class="card"><div class="stat">${prov.total}</div><div class="label">providers swept<br>${prov.endpointsSeen} endpoints</div></div>
+      <div class="card"><div class="stat">${prov.total}</div><div class="label">providers inspected, one listing each<br>out of ${prov.endpointsSeen} endpoints surfaced</div></div>
       <div class="card"><div class="stat amber">${prov.thirdPartyDocHost}</div><div class="label">document at a host that does not match the brand asserted (${pct(prov.thirdPartyDocHost, prov.total)})</div></div>
       <div class="card"><div class="stat">$0.00</div><div class="label">cost of the entire sweep — discovery and inspection settle nothing</div></div>
     </div>
 
     <h2>${front.count} brands, one counterparty</h2>
-    <p>Of the ${prov.thirdPartyDocHost} mismatches, <strong>${front.count}</strong> resolve to a single host: <code>${esc(front.domain)}</code>. An agent picking any of these by name is buying from the same place.</p>
+    <p>Of the ${prov.thirdPartyDocHost} mismatches, <strong>${front.count}</strong> document at a single host: <code>${esc(front.domain)}</code>. An agent picking any of these by name gets a listing documented in the same place. We call that host the listing's <em>counterparty</em> — the host a screen should be pointed at. It is evidence about who stands behind the endpoint, not proof of who operates it or receives the payment.</p>
     <div class="card"><p class="muted" style="margin:0;font-size:14px">${front.brands.map(esc).join(' · ')}</p></div>
     <p class="muted" style="font-size:14px">A further ${prov.undocumented} listings publish no documentation URL at all. ${prov.verifiedButNotFirstParty} of the ${prov.total} carry <code>verified</code> while not documenting on their own host.</p>
     <div class="limit"><strong>This is not an allegation of deception.</strong> ${esc(front.domain)} is named openly in each listing's own documentation URL, and the endpoints return real data. The narrow point is that <code>providerName</code> and <code>verified</code> are what an agent sees when it selects, and neither of them carries this fact.</div>
 
     <h2>Knowing the counterparty halves the bill</h2>
-    <p>A cohort screen that bills once per listed brand pays ${front.count} times for one host — and points its evidence at the brand's own website instead of the party that answers. Resolving counterparties first fixes the target and the price at once.</p>
+    <p>A cohort screen that bills once per listed brand pays ${front.count} times for one host — and points its evidence at the brand's own website instead of the host its own listing documents. Resolving counterparties first fixes the target and the price at once.</p>
     <div class="grid three">
       <div class="card"><div class="stat">${plan.listedBrands}</div><div class="label">screenable listings</div></div>
-      <div class="card"><div class="stat amber">${plan.distinctCounterparties}</div><div class="label">distinct hosts that answer</div></div>
-      <div class="card"><div class="stat">−${pct(plan.savedUsd, plan.naiveCostUsd)}</div><div class="label">${usd(plan.naiveCostUsd)} → ${usd(plan.dedupedCostUsd)}</div></div>
+      <div class="card"><div class="stat amber">${plan.distinctCounterparties}</div><div class="label">distinct documentation hosts</div></div>
+      <div class="card"><div class="stat">−${pct(plan.savedUsd, plan.naiveCostUsd)}</div><div class="label">planned: ${usd(plan.naiveCostUsd)} → ${usd(plan.dedupedCostUsd)}<br>the run then spent ${usd(screen.spentUsd)}</div></div>
     </div>
 
     <h2>What the paid screen found</h2>
@@ -122,7 +120,7 @@ const html = `<!doctype html>
     <div class="card">
 ${byGrade.map(([g, n]) => `      <div class="bar"><span class="k g${g}">${g}</span><span class="t g${g}-b" style="width:${(100 * n / maxGrade).toFixed(1)}%"></span><span class="muted">${n}</span></div>`).join('\n')}
     </div>
-    <p><strong>${dOrF} of ${screen.screened}</strong> — ${pct(dOrF, screen.screened)} — grade D or F on security headers. These are the counterparties an agent would pay.${parseBot ? ` <code>${esc(front.domain)}</code>, the host behind ${front.count} brand names, grades <strong>${esc(parseBot.grade)}</strong>.` : ''}</p>
+    <p><strong>${dOrF} of ${screen.screened}</strong> — ${pct(dOrF, screen.screened)} — grade D or F on security headers. These are the hosts the listings document, and so the hosts a screen should target.${parseBot ? ` <code>${esc(front.domain)}</code>, the host behind ${front.count} brand names, grades <strong>${esc(parseBot.grade)}</strong>.` : ''}</p>
 
     <div class="scroll"><table>
       <thead><tr><th>Counterparty</th><th>Grade</th><th class="num-cell">Score</th><th class="num-cell">Brands</th></tr></thead>
@@ -133,13 +131,10 @@ ${rows}
 ${failed.length ? `    <p class="muted" style="font-size:14px">${failed.length} host${failed.length > 1 ? 's' : ''} could not be screened (${failed.map(f => esc(f.host)).join(', ')}) — answered non-2xx, billed ${usd(0)}, recorded as failed. Unscreened is not a pass.</p>` : ''}
 ${plan.unscreenable.length ? `    <p class="muted" style="font-size:14px">${plan.unscreenable.length} listings were excluded before spending because they publish no host to point evidence at: ${plan.unscreenable.map(u => esc(u.providerName)).join(', ')}. Unevaluated is not clean.</p>` : ''}
 
-${x402 ? `    <h2>Paid with no account</h2>
-    <p>The same job settles on Monid's x402 rail, where the buyer holds a wallet rather than an account. Policy runs before a signer is ever constructed, and refuses on its own terms.</p>
-    <div class="grid two">
-      <div class="card"><div class="stat amber">${usd(x402.usdcSpent)}</div><div class="label">first USDC payment, Base<br><code>${esc(x402.txHash || x402.settlement || 'settled')}</code></div></div>
-      <div class="card"><div class="stat">${x402.refusalsBefore ?? 0} → 1</div><div class="label">signer invocations: refused every time until policy allowed</div></div>
-    </div>
-` : ''}
+    <h2>Which rail paid for this</h2>
+    <p>Every figure on this page settled on Monid's prepaid rail, against a workspace balance a person topped up. Nothing here shows an agent buying a counterparty screen without an account.</p>
+    <p>The account-free rail is proven separately, in the companion repo <code>monid-x402</code>: a live 402, a signed EIP-3009 authorization, and a settled <strong>$0.01 USDC payment on Base</strong> on 2026-09-12 — block 51197570, <code>signer_invocation_count: 1</code> — next to refuse packets that stop at <code>signer_invocation_count: 0</code> without ever constructing a signer. That payment bought a <code>context.dev</code> scrape, not a counterparty screen. <a href="https://twzrd-sol.github.io/monid-x402/paid.json">Receipt</a>.</p>
+
     <h2>What this does and does not establish</h2>
     <div class="limit">${esc(prov.limitation)}</div>
     <div class="limit">${esc(screen.limitation)}</div>
@@ -164,4 +159,3 @@ writeFileSync('pages/counterparty.html', html);
 console.log(`Wrote pages/counterparty.html (${html.length} bytes)`);
 console.log(`  providers ${prov.total}, third-party ${prov.thirdPartyDocHost}, front ${front.domain} x${front.count}`);
 console.log(`  screened ${screen.screened}, brands ${screen.brandsCovered}, spent ${usd(screen.spentUsd)}`);
-console.log(`  x402 section: ${x402 ? 'included' : 'omitted (no evidence/x402-first-payment.json yet)'}`);

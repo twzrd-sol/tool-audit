@@ -28,11 +28,12 @@ The first pass asked what a vendor check costs. That is the cheap question.
 Before an agent pays, the harder one is who will answer the call.
 
 A Monid discovery result gives an agent a brand name and often a `verified`
-tag. Neither names the operator. The one operator signal published per
-endpoint is its documentation URL, so we read all of them.
+tag. Neither names the operator. The closest thing Monid publishes is the
+documentation URL on the listing, so we read one per provider.
 
-Swept with discovery and inspection only — **62 providers, 412 endpoints,
-$0.00**, workspace balance $22.46 before and $22.46 after:
+Swept with discovery and inspection only — 25 seed queries surfaced **409
+endpoints across 62 providers**, and we inspected **one endpoint per provider,
+62 in all**, for **$0.00**. Workspace balance $22.46 before and $22.46 after:
 
 | | Count | Share |
 | --- | ---: | ---: |
@@ -41,9 +42,12 @@ $0.00**, workspace balance $22.46 before and $22.46 after:
 | No documentation URL at all | 3 | 5% |
 | Carrying `verified` while not documenting on their own host | **32** | 52% |
 
-Of the 30 mismatches, **29 resolve to a single host**, `parse.bot`. An agent
+Of the 30 mismatches, **29 document at a single host**, `parse.bot`. An agent
 selecting Nasdaq, Crunchbase, G2, Trustpilot, Zillow, Indeed, Y Combinator,
-Yahoo Finance, Capterra or Wellfound by name is buying from the same place.
+Yahoo Finance, Capterra or Wellfound by name gets a listing documented at the
+same place. We call that host the listing's counterparty: the host a screen
+should be pointed at. It is evidence about who stands behind the endpoint, not
+proof of who operates it or receives the payment.
 
 This is not an allegation of deception. `parse.bot` is named openly in each
 listing's own documentation URL and the endpoints return real data. The narrow
@@ -53,13 +57,14 @@ selects, and neither carries this fact.
 ### Knowing the counterparty halves the paid work
 
 A cohort screen billing once per listed brand pays 29 times for one host, and
-points its evidence at the brand's website instead of the party that answers.
-Resolving counterparties first corrects the target and the price together.
+points its evidence at the brand's website instead of the host its own listing
+documents. Resolving counterparties first corrects the target and the price
+together.
 
 | | |
 | --- | ---: |
 | Screenable listings | 59 |
-| Distinct hosts that answer | **31** |
+| Distinct documentation hosts | **31** |
 | Naive per-brand cost | $3.5046 |
 | Counterparty-deduplicated cost | **$1.8414** |
 
@@ -67,13 +72,14 @@ Measured run: 31 targets, **30 screened**, 1 failed, **58 brands covered for
 $1.7820** against a $2.00 ceiling. `api.kadec0.xyz` answered HTTP 400, was
 billed $0.00, and is recorded failed — a non-2xx is not evidence.
 
-Security-header grades across the counterparties an agent would actually pay:
+Security-header grades across those 30 documentation hosts:
 
 | A | B | C | D | F |
 | ---: | ---: | ---: | ---: | ---: |
 | 6 | 1 | 7 | 5 | **11** |
 
-**54% grade D or F.** `parse.bot`, the host behind 29 brand names, grades C.
+**16 of 30 — 53% — grade D or F.** `parse.bot`, the host behind 29 brand
+names, grades C.
 `context.dev` and `strale.io` — the two suppliers the frozen v1 demo itself
 paid — both grade **F**.
 
@@ -94,14 +100,23 @@ header grade is not an approval to spend. Undocumented listings are returned
 unevaluated, and unevaluated is not clean. Coverage is what 25 seed queries
 surfaced, not a guaranteed enumeration of the catalog.
 
-### What we did not do
+### Which rail paid for this
 
-No payment was made on Monid's x402 rail. The companion repo `monid-x402`
-proves the refusing half of a pre-spend gate against live 402s with
-`signer_invocation_count: 0`, and the paying half remains unexercised because
-the wallet was never funded. The `counterparty-provenance` SKU defined there
-is priced, schema'd and costed against measured COGS, but it has not been
-sold. Both trees say so in their own assertions.
+Every figure above settled on Monid's prepaid rail against the workspace
+balance. None of it was bought over x402, so nothing here demonstrates an agent
+buying a counterparty screen without an account.
+
+The x402 rail itself is proven separately in the companion repo `monid-x402`:
+a live 402, a signed EIP-3009 authorization, and a settled **$0.01 USDC payment
+on Base** on 2026-09-12 — transaction `0x4a87dcf1…`, block 51197570,
+`signer_invocation_count: 1` — alongside refuse packets that end at
+`signer_invocation_count: 0` without ever constructing a signer. That payment
+bought a `context.dev` scrape. Receipt:
+<https://twzrd-sol.github.io/monid-x402/paid.json>
+
+The `counterparty-provenance` SKU defined there is priced, schema'd and costed
+against measured COGS. It has not been sold. No agent has bought a counterparty
+screen over x402.
 
 ## What it replaces
 
@@ -121,7 +136,7 @@ The measured snapshot used three live Monid calls:
 | Inspect target cookie/consent evidence | `api.strale.io:/x402/v2/cookie-scan` | $0.1782 |
 | **Successful three-call chain** | | **$0.2385** |
 | Earlier failed/ambiguous attempt (`01M272SPTD953E3M0WVHF2WSN2`) | `context.dev:/web/scrape/markdown` | $0.0009 |
-| **Total measured campaign spend** | | **$0.2394** |
+| **v1 measured subtotal** | | **$0.2394** |
 
 200 repetitions at those measured rates would cost **$47.70**. Those
 repetitions are not equivalent to 200 Vendorapp AI pre-screens. Hosting and
@@ -211,8 +226,9 @@ node dist/cli.js audit api.strale.io:/x402/header-security-check
 ## Paid vendor pre-screen
 
 This command makes three paid calls. It first checks the complete advertised
-per-call cost against a $0.24 ceiling. Do not re-run it for this submission;
-the measured $0.2385 chain is the final paid E2E. Campaign spend is $0.2394.
+per-call cost against a $0.24 ceiling. The measured $0.2385 chain is the final
+paid run of the v1 pre-screen; its subtotal is $0.2394. The 2026-09-15
+counterparty screen added $1.7820, for a campaign total of $2.0214.
 
 ```bash
 node dist/cli.js prescreen https://monid.ai \

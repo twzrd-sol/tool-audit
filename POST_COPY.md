@@ -20,9 +20,10 @@ Breakdown, if asked:
 | v2 counterparty screen, 30 hosts covering 58 brands | 2026-09-15 | $1.7820 |
 | **Total** | | **$2.0214** |
 
-Provenance sweep, 62 providers and 412 endpoints, cost **$0.00** — discovery
-and inspection settle nothing. Workspace balance $22.46 before, $20.68 after;
-the $1.78 delta is the paid screen alone and matches the receipts exactly.
+Provenance sweep, 409 endpoints surfaced and 62 providers inspected, cost
+**$0.00** — discovery and inspection settle nothing. Workspace balance $22.46
+before, $20.68 after; the $1.78 delta is the paid screen alone and matches the
+receipts exactly.
 
 ## X / LinkedIn post
 
@@ -31,11 +32,11 @@ We set out to undercut Vendorapp's $149/mo vendor pre-screens. We found somethin
 
 Before an agent pays a vendor, the real question isn't what the check costs. It's who it's actually paying.
 
-We asked that of Monid's own catalog — 62 providers, 412 endpoints — using only free discovery. Cost: $0.00.
+We asked that of Monid's own catalog. 25 free discovery queries surfaced 409 endpoints across 62 providers, and we read the documentation host on one listing per provider. Cost: $0.00.
 
 30 of 62 document at a host that doesn't match the brand they advertise. 29 of those are the same host. 32 carry a "verified" tag while not documenting on their own domain.
 
-Knowing the counterparty then halved the paid work: 59 listings collapse to 31 hosts that actually answer. $3.50 → $1.78. Of those, 54% grade D or F on security headers.
+Knowing the counterparty then halved the paid work: 59 listings collapse to 31 documentation hosts. Screening those planned $1.84 against $3.50 per brand name; the run spent $1.78 across 30 of them, one having answered HTTP 400 for $0. 16 of the 30 grade D or F on security headers.
 
 Including the two suppliers our own first demo paid. Both F.
 
@@ -46,7 +47,7 @@ https://twzrd-sol.github.io/tool-audit/counterparty.html
 ## YouTube title
 
 ```text
-29 AI vendors, one counterparty: reading 412 endpoints' docs for $0 #monid
+29 AI vendors, one documentation host: reading 62 Monid listings for $0 #monid
 ```
 
 ## Short caption (Instagram / TikTok, only if a clean 9:16 cut exists)
@@ -54,7 +55,7 @@ https://twzrd-sol.github.io/tool-audit/counterparty.html
 ```text
 Checked where 62 AI data vendors document their endpoints. 30 point to a host that isn't the brand on the listing — and 29 of those point to the same one. The check cost $0.00.
 
-Then screening only the real counterparties cost $1.78 instead of $3.50.
+Then screening 30 of those hosts cost $1.78, where screening all 59 brand names would have cost $3.50.
 #monid
 ```
 
@@ -68,18 +69,21 @@ after the question underneath it: before an agent pays a vendor, who is it
 actually paying?
 
 Answered across your catalog with discovery and inspection only, so it cost
-nothing: 62 providers, 412 endpoints. 30 document at a host that doesn't match
-the brand they assert, 29 of those at parse.bot, and 3 publish no docs at all.
+nothing: 25 seed queries surfaced 409 endpoints across 62 providers, and we
+read the documentation host on one listing per provider. 30 document at a host
+that doesn't match the brand they assert, 29 of those at parse.bot, and 3
+publish no docs at all.
 32 of the 62 carry `verified` while not documenting on their own host. That's
 a metadata observation, not an accusation — parse.bot is named openly in each
 listing's own docUrl. The point is that providerName and the verified tag are
 what an agent sees at selection time, and neither carries it.
 
-That finding then paid for itself: deduplicating 59 listings onto the 31 hosts
-that actually answer took the screen from $3.5046 to $1.7820, on work that
-would otherwise have audited the wrong host 29 times. 54% of those
-counterparties grade D or F on security headers — including context.dev and
-strale.io, the two suppliers our own v1 demo paid.
+That finding then paid for itself: deduplicating 59 listings onto 31
+documentation hosts planned $1.8414 against $3.5046 per brand name, on work
+that would otherwise have audited the wrong host 29 times. The run spent
+$1.7820 across 30 of them, one having answered HTTP 400 for $0. 16 of those 30
+grade D or F on security headers — including context.dev and strale.io, the two
+suppliers our own v1 demo paid.
 
 Total measured spend across both runs: $2.0214.
 
@@ -90,11 +94,17 @@ metadata, and you may want it regardless of how this places.
 
 ## What we are not claiming
 
-No payment was made on the x402 rail. `monid-x402` proves the refusing half of
-a pre-spend gate against live 402s with `signer_invocation_count: 0`; the
-paying half is unexercised because the wallet was never funded. The
-`counterparty-provenance` SKU is priced, schema'd and costed against measured
-COGS, and has not been sold. Do not let any post imply otherwise.
+This screen settled on Monid's prepaid rail, not x402. No post may say or imply
+that an agent bought a counterparty screen with no account and no human.
+
+The x402 rail itself is proven separately in `monid-x402`: a settled $0.01 USDC
+payment on Base on 2026-09-12, transaction `0x4a87dcf1…`, block 51197570,
+`signer_invocation_count: 1`, next to refuse packets that stop at
+`signer_invocation_count: 0`. It bought a context.dev scrape, not a
+counterparty screen. Receipt: https://twzrd-sol.github.io/monid-x402/paid.json
+
+The `counterparty-provenance` SKU is priced, schema'd and costed against
+measured COGS, and has not been sold.
 
 The provenance signal is a documentation host. It identifies who documents an
 endpoint, not who operates it, receives payment, or holds the data. Coverage is

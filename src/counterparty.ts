@@ -102,6 +102,6 @@ export function planCounterpartyScreen(
     dedupedCostUsd: deduped,
     savedUsd: round(naive - deduped),
     note:
-      'Screening targets are the hosts that answer, not the brands that are listed. Undocumented listings are excluded from the paid set and remain unevaluated, which is not the same as clean.'
+      'Screening targets are the hosts the listings document, not the brands that are listed. Undocumented listings are excluded from the paid set and remain unevaluated, which is not the same as clean.'
   };
 }

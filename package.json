@@ -53,7 +53,7 @@
     "prepack": "tsc",
     "start": "node dist/server.js",
     "dev": "tsx src/server.ts",
-    "test": "npm run build && node --test dist/audit.test.js dist/evidence.test.js dist/monid.test.js dist/vendor-prescreen.test.js && node scripts/verify-snapshot.mjs",
+    "test": "npm run build && node --test dist/audit.test.js dist/evidence.test.js dist/monid.test.js dist/vendor-prescreen.test.js dist/provenance.test.js dist/counterparty.test.js dist/cohort-screen.test.js && node scripts/verify-snapshot.mjs",
     "verify:snapshot": "node scripts/verify-snapshot.mjs",
     "verify:evidence": "npm run build && node scripts/verify-evidence.mjs",
     "pack:check": "npm pack --dry-run",

@@ -6,7 +6,9 @@
  * result asserts a brand through `providerName` and may carry Monid's
  * `verified` tag, but neither field names the operator behind the endpoint.
  *
- * The one operator signal Monid publishes per endpoint is `docUrl`. This module
+ * The closest thing to an operator signal Monid publishes per endpoint is `docUrl`.
+ * It names who documents the endpoint, which is evidence about, not proof of, who
+ * operates it. This module
  * compares the host documenting the endpoint against the brand the listing
  * asserts, and reports the mismatch as evidence.
  *

@@ -8,7 +8,7 @@
   <link rel="canonical" href="https://twzrd-sol.github.io/tool-audit/counterparty.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="29 brands, one counterparty: what 62 vendor listings actually document">
-  <meta property="og:description" content="Free preflight read where every listing documents itself. 29 brands document at one host. Screening those hosts instead of the brand names cost $1.7820 instead of $3.5046.">
+  <meta property="og:description" content="Free preflight read where every listing documents itself. 29 brands document at one host. Screening 30 of those hosts cost $1.7820, where screening all 59 brand names would have cost $3.5046.">
   <meta property="og:url" content="https://twzrd-sol.github.io/tool-audit/counterparty.html">
   <meta name="twitter:card" content="summary">
   <style>
@@ -57,27 +57,27 @@
 <body>
   <main>
     <p class="kicker">Measured 2026-09-15 · reproducible · not a live query</p>
-    <h1>Our first pass asked what a vendor check costs. The question before that one is who will actually answer the call.</h1>
-    <p class="lede muted">A Monid discovery result gives an agent a brand name and, often, a <code>verified</code> tag. Neither of those names the operator that answers the call. The one operator signal published per endpoint is its documentation URL — so we read all of them.</p>
+    <h1>Our first pass asked what a vendor check costs. The question before that one is who the listing actually points to.</h1>
+    <p class="lede muted">A Monid discovery result gives an agent a brand name and, often, a <code>verified</code> tag. Neither of those names the operator behind the endpoint. The closest thing Monid publishes is the documentation URL on the listing — so we read one per provider, 62 in all.</p>
 
     <div class="grid three" style="margin:28px 0">
-      <div class="card"><div class="stat">62</div><div class="label">providers swept<br>409 endpoints</div></div>
+      <div class="card"><div class="stat">62</div><div class="label">providers inspected, one listing each<br>out of 409 endpoints surfaced</div></div>
       <div class="card"><div class="stat amber">30</div><div class="label">document at a host that does not match the brand asserted (48%)</div></div>
       <div class="card"><div class="stat">$0.00</div><div class="label">cost of the entire sweep — discovery and inspection settle nothing</div></div>
     </div>
 
     <h2>29 brands, one counterparty</h2>
-    <p>Of the 30 mismatches, <strong>29</strong> resolve to a single host: <code>parse.bot</code>. An agent picking any of these by name is buying from the same place.</p>
+    <p>Of the 30 mismatches, <strong>29</strong> document at a single host: <code>parse.bot</code>. An agent picking any of these by name gets a listing documented in the same place. We call that host the listing's <em>counterparty</em> — the host a screen should be pointed at. It is evidence about who stands behind the endpoint, not proof of who operates it or receives the payment.</p>
     <div class="card"><p class="muted" style="margin:0;font-size:14px">AAA Gas Prices · AccuWeather · Artificial Analysis · Built In · Capterra · Clutch · Crunchbase · Finviz · G2 · GetApp · Homes.com · IQAir · Idealist · Indeed · LMArena · Levels.fyi · LoopNet · MarketBeat · Nasdaq · SECForm4 · StockAnalysis · The Companies API · Trustpilot · Weather Underground · Web3 Career · Wellfound · Y Combinator · Yahoo Finance · Zillow</p></div>
     <p class="muted" style="font-size:14px">A further 3 listings publish no documentation URL at all. 32 of the 62 carry <code>verified</code> while not documenting on their own host.</p>
     <div class="limit"><strong>This is not an allegation of deception.</strong> parse.bot is named openly in each listing's own documentation URL, and the endpoints return real data. The narrow point is that <code>providerName</code> and <code>verified</code> are what an agent sees when it selects, and neither of them carries this fact.</div>
 
     <h2>Knowing the counterparty halves the bill</h2>
-    <p>A cohort screen that bills once per listed brand pays 29 times for one host — and points its evidence at the brand's own website instead of the party that answers. Resolving counterparties first fixes the target and the price at once.</p>
+    <p>A cohort screen that bills once per listed brand pays 29 times for one host — and points its evidence at the brand's own website instead of the host its own listing documents. Resolving counterparties first fixes the target and the price at once.</p>
     <div class="grid three">
       <div class="card"><div class="stat">59</div><div class="label">screenable listings</div></div>
-      <div class="card"><div class="stat amber">31</div><div class="label">distinct hosts that answer</div></div>
-      <div class="card"><div class="stat">−47%</div><div class="label">$3.5046 → $1.8414</div></div>
+      <div class="card"><div class="stat amber">31</div><div class="label">distinct documentation hosts</div></div>
+      <div class="card"><div class="stat">−47%</div><div class="label">planned: $3.5046 → $1.8414<br>the run then spent $1.7820</div></div>
     </div>
 
     <h2>What the paid screen found</h2>
@@ -89,7 +89,7 @@
       <div class="bar"><span class="k gD">D</span><span class="t gD-b" style="width:45.5%"></span><span class="muted">5</span></div>
       <div class="bar"><span class="k gF">F</span><span class="t gF-b" style="width:100.0%"></span><span class="muted">11</span></div>
     </div>
-    <p><strong>16 of 30</strong> — 53% — grade D or F on security headers. These are the counterparties an agent would pay. <code>parse.bot</code>, the host behind 29 brand names, grades <strong>C</strong>.</p>
+    <p><strong>16 of 30</strong> — 53% — grade D or F on security headers. These are the hosts the listings document, and so the hosts a screen should target. <code>parse.bot</code>, the host behind 29 brand names, grades <strong>C</strong>.</p>
 
     <div class="scroll"><table>
       <thead><tr><th>Counterparty</th><th>Grade</th><th class="num-cell">Score</th><th class="num-cell">Brands</th></tr></thead>
@@ -279,6 +279,9 @@
     <p class="muted" style="font-size:14px">1 host could not be screened (kadec0.xyz) — answered non-2xx, billed $0.0000, recorded as failed. Unscreened is not a pass.</p>
     <p class="muted" style="font-size:14px">3 listings were excluded before spending because they publish no host to point evidence at: DefiLlama, Simple FS, TikHub. Unevaluated is not clean.</p>
 
+    <h2>Which rail paid for this</h2>
+    <p>Every figure on this page settled on Monid's prepaid rail, against a workspace balance a person topped up. Nothing here shows an agent buying a counterparty screen without an account.</p>
+    <p>The account-free rail is proven separately, in the companion repo <code>monid-x402</code>: a live 402, a signed EIP-3009 authorization, and a settled <strong>$0.01 USDC payment on Base</strong> on 2026-09-12 — block 51197570, <code>signer_invocation_count: 1</code> — next to refuse packets that stop at <code>signer_invocation_count: 0</code> without ever constructing a signer. That payment bought a <code>context.dev</code> scrape, not a counterparty screen. <a href="https://twzrd-sol.github.io/monid-x402/paid.json">Receipt</a>.</p>
 
     <h2>What this does and does not establish</h2>
     <div class="limit">UNABLE_TO_VERIFY_OPERATOR: docUrl identifies who documents this endpoint, not who operates it, receives payment, or holds the data. A matching host is not proof of first-party operation.</div>
