@@ -59,6 +59,7 @@
     <p class="kicker">Measured 2026-09-15 · reproducible · not a live query</p>
     <h1>Our first pass asked what a vendor check costs. The question before that one is who the listing actually points to.</h1>
     <p class="lede muted">A Monid discovery result gives an agent a brand name and, often, a <code>verified</code> tag. Neither of those names the operator behind the endpoint. The closest thing Monid publishes is the documentation URL on the listing — so we read one per provider, 62 in all.</p>
+    <div class="limit"><strong>The ordering is the whole point, so we measured it.</strong> Across 3 queries, a discovery result carried <code>description</code>, <code>endpoint</code>, <code>hints</code>, <code>metrics</code>, <code>price</code>, <code>provider</code>, <code>providerName</code>, <code>score</code>, <code>tags</code>. <code>docUrl</code> was not among them: it appears only after a separate <code>inspect</code> call, alongside <code>categories</code>, <code>input</code>, <code>method</code>, <code>notes</code>, <code>summary</code>. So an agent choosing a tool sees the brand and the <code>verified</code> tag, and cannot see the documentation host until it asks for it. Balance $20.68 before and $20.68 after — asking costs nothing.</div>
 
     <div class="grid three" style="margin:28px 0">
       <div class="card"><div class="stat">62</div><div class="label">providers inspected, one listing each<br>out of 409 endpoints surfaced</div></div>

@@ -1,0 +1,108 @@
+{
+  "schema": "tool-audit.selection-blindness.v1",
+  "measuredAt": "2026-09-15T19:06:18.756Z",
+  "queries": [
+    "stock market finance",
+    "company data enrichment",
+    "security scan"
+  ],
+  "endpointsDiscovered": 30,
+  "paidRuns": 0,
+  "costUsd": 0,
+  "balanceCheck": {
+    "before": "$20.68",
+    "after": "$20.68",
+    "method": "monid balance, read immediately before and after this script"
+  },
+  "fieldsAtSelection": [
+    "description",
+    "endpoint",
+    "hints",
+    "metrics",
+    "price",
+    "provider",
+    "providerName",
+    "score",
+    "tags"
+  ],
+  "fieldsAfterInspect": [
+    "categories",
+    "description",
+    "docUrl",
+    "endpoint",
+    "hints",
+    "input",
+    "method",
+    "metrics",
+    "notes",
+    "price",
+    "provider",
+    "providerName",
+    "summary",
+    "tags"
+  ],
+  "fieldsOnlyAvailableAfterInspect": [
+    "categories",
+    "docUrl",
+    "input",
+    "method",
+    "notes",
+    "summary"
+  ],
+  "docUrlAtSelection": false,
+  "verifiedTagAtSelection": true,
+  "samples": [
+    {
+      "query": "stock market finance",
+      "toolId": "stockanalysis:/get_stock_statistics",
+      "atSelection": {
+        "providerName": "StockAnalysis",
+        "tags": [
+          "verified"
+        ],
+        "docUrl": null
+      },
+      "afterInspect": {
+        "providerName": "StockAnalysis",
+        "tags": [
+          "verified"
+        ],
+        "docUrl": "https://parse.bot/marketplace/stockanalysis-com-api"
+      }
+    },
+    {
+      "query": "company data enrichment",
+      "toolId": "akta:/v1/company/enrichment",
+      "atSelection": {
+        "providerName": "Akta",
+        "tags": [
+          "verified"
+        ],
+        "docUrl": null
+      },
+      "afterInspect": {
+        "providerName": "Akta",
+        "tags": [
+          "verified"
+        ],
+        "docUrl": "https://docs.akta.pro/api-reference/company-data"
+      }
+    },
+    {
+      "query": "security scan",
+      "toolId": "api.strale.io:/x402/secret-scan",
+      "atSelection": {
+        "providerName": "Strale",
+        "tags": [],
+        "docUrl": null
+      },
+      "afterInspect": {
+        "providerName": "Strale",
+        "tags": [],
+        "docUrl": "https://api.strale.io/x402/secret-scan"
+      }
+    }
+  ],
+  "finding": "Discovery carries providerName and the verified tag but not docUrl. An agent cannot see the documentation host at selection time; it has to inspect a listing to learn it.",
+  "limitation": "This records the fields Monid returned for these queries at this moment. It is not a statement about Monid’s API contract, which may change, and other routes may expose docUrl."
+}
