@@ -46,13 +46,13 @@ https://twzrd-sol.github.io/tool-audit/counterparty.html
 ## YouTube title
 
 ```text
-48% of this AI tool catalog isn't who it says it is — we checked for $0 #monid
+29 AI vendors, one counterparty: reading 412 endpoints' docs for $0 #monid
 ```
 
 ## Short caption (Instagram / TikTok, only if a clean 9:16 cut exists)
 
 ```text
-Asked who 62 AI data vendors actually are. 30 aren't who their name says. 29 of those are the same host. The check cost $0.00.
+Checked where 62 AI data vendors document their endpoints. 30 point to a host that isn't the brand on the listing — and 29 of those point to the same one. The check cost $0.00.
 
 Then screening only the real counterparties cost $1.78 instead of $3.50.
 #monid

@@ -44,8 +44,8 @@ const html = `<!doctype html>
   <meta name="description" content="Measured ${esc(screen.screenedAt.slice(0, 10))}: ${prov.thirdPartyDocHost} of ${prov.total} Monid providers document at a host that does not match the brand they assert. ${front.count} of them at ${esc(front.domain)}. Preflight cost $0.00; the paid counterparty screen cost ${usd(screen.spentUsd)}.">
   <link rel="canonical" href="https://twzrd-sol.github.io/tool-audit/counterparty.html">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="${prov.thirdPartyDocHost} of ${prov.total} vendors are not who the name says">
-  <meta property="og:description" content="Free preflight named the real counterparty behind every listing. ${front.count} brands resolve to one host. The paid screen then cost ${usd(screen.spentUsd)} instead of ${usd(plan.naiveCostUsd)}.">
+  <meta property="og:title" content="${front.count} brands, one counterparty: what ${prov.total} vendor listings actually document">
+  <meta property="og:description" content="Free preflight read where every listing documents itself. ${front.count} brands document at one host. Screening those hosts instead of the brand names cost ${usd(screen.spentUsd)} instead of ${usd(plan.naiveCostUsd)}.">
   <meta property="og:url" content="https://twzrd-sol.github.io/tool-audit/counterparty.html">
   <meta name="twitter:card" content="summary">
   <style>
@@ -94,7 +94,7 @@ const html = `<!doctype html>
 <body>
   <main>
     <p class="kicker">Measured ${esc(screen.screenedAt.slice(0, 10))} · reproducible · not a live query</p>
-    <h1>Our first pass asked what a vendor check costs. The question before that one is who you are actually paying.</h1>
+    <h1>Our first pass asked what a vendor check costs. The question before that one is who will actually answer the call.</h1>
     <p class="lede muted">A Monid discovery result gives an agent a brand name and, often, a <code>verified</code> tag. Neither of those names the operator that answers the call. The one operator signal published per endpoint is its documentation URL — so we read all of them.</p>
 
     <div class="grid three" style="margin:28px 0">
