@@ -14,8 +14,94 @@ query. They reprint the 2026-09-11 retry. Re-verify locally with
 (read-only Monid `runs get`, no new spend).
 
 A prior $0.0009 pricing-only attempt plus this $0.2385 retry settled at
-**$0.2394** cumulative, **$0.0006** under the $0.24 ceiling. That $0.2385
-retry is the final paid E2E. Do not spend again for this submission.
+**$0.2394** cumulative, **$0.0006** under the $0.24 ceiling. That closed the
+first submission.
+
+The hackathon was then extended and $20 of Monid credit was granted, so a
+second measured run followed on 2026-09-15 at **$1.7820** — see the update
+below. **Total measured campaign spend across both runs: $2.0214.** Workspace
+balance $22.46 before, $20.68 after; receipts and balance agree.
+
+## Update, 2026-09-15: who are you actually paying?
+
+The first pass asked what a vendor check costs. That is the cheap question.
+Before an agent pays, the harder one is who will answer the call.
+
+A Monid discovery result gives an agent a brand name and often a `verified`
+tag. Neither names the operator. The one operator signal published per
+endpoint is its documentation URL, so we read all of them.
+
+Swept with discovery and inspection only — **62 providers, 412 endpoints,
+$0.00**, workspace balance $22.46 before and $22.46 after:
+
+| | Count | Share |
+| --- | ---: | ---: |
+| Documented on their own host | 29 | 47% |
+| Documented at a host that does not match the brand asserted | **30** | 48% |
+| No documentation URL at all | 3 | 5% |
+| Carrying `verified` while not documenting on their own host | **32** | 52% |
+
+Of the 30 mismatches, **29 resolve to a single host**, `parse.bot`. An agent
+selecting Nasdaq, Crunchbase, G2, Trustpilot, Zillow, Indeed, Y Combinator,
+Yahoo Finance, Capterra or Wellfound by name is buying from the same place.
+
+This is not an allegation of deception. `parse.bot` is named openly in each
+listing's own documentation URL and the endpoints return real data. The narrow
+point is that `providerName` and `verified` are what an agent sees when it
+selects, and neither carries this fact.
+
+### Knowing the counterparty halves the paid work
+
+A cohort screen billing once per listed brand pays 29 times for one host, and
+points its evidence at the brand's website instead of the party that answers.
+Resolving counterparties first corrects the target and the price together.
+
+| | |
+| --- | ---: |
+| Screenable listings | 59 |
+| Distinct hosts that answer | **31** |
+| Naive per-brand cost | $3.5046 |
+| Counterparty-deduplicated cost | **$1.8414** |
+
+Measured run: 31 targets, **30 screened**, 1 failed, **58 brands covered for
+$1.7820** against a $2.00 ceiling. `api.kadec0.xyz` answered HTTP 400, was
+billed $0.00, and is recorded failed — a non-2xx is not evidence.
+
+Security-header grades across the counterparties an agent would actually pay:
+
+| A | B | C | D | F |
+| ---: | ---: | ---: | ---: | ---: |
+| 6 | 1 | 7 | 5 | **11** |
+
+**54% grade D or F.** `parse.bot`, the host behind 29 brand names, grades C.
+`context.dev` and `strale.io` — the two suppliers the frozen v1 demo itself
+paid — both grade **F**.
+
+Full write-up: <https://twzrd-sol.github.io/tool-audit/counterparty.html>
+
+```bash
+node dist/cli.js catalog-provenance --out evidence/catalog-provenance.json   # free
+node dist/cli.js cohort-screen --confirm-spend --max-total 2                 # paid
+node scripts/market-scan.mjs                                                 # free
+```
+
+### What this does not establish
+
+A documentation host identifies who documents an endpoint, not who operates
+it, receives payment, or holds the data. A matching host is not proof of
+first-party operation; it only means this signal raised no mismatch. A passing
+header grade is not an approval to spend. Undocumented listings are returned
+unevaluated, and unevaluated is not clean. Coverage is what 25 seed queries
+surfaced, not a guaranteed enumeration of the catalog.
+
+### What we did not do
+
+No payment was made on Monid's x402 rail. The companion repo `monid-x402`
+proves the refusing half of a pre-spend gate against live 402s with
+`signer_invocation_count: 0`, and the paying half remains unexercised because
+the wallet was never funded. The `counterparty-provenance` SKU defined there
+is priced, schema'd and costed against measured COGS, but it has not been
+sold. Both trees say so in their own assertions.
 
 ## What it replaces
 
