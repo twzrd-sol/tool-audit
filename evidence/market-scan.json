@@ -36,9 +36,9 @@
     "text_extraction": {
       "label": "Text / document extraction",
       "keywordMatches": 67,
-      "sellerCount": 67,
+      "listingCount": 67,
       "distinctProviders": 11,
-      "floorPriceUsd": 0.00009,
+      "floorPriceUsd": 9e-05,
       "freeOrZeroPriced": 6,
       "excludedOnReview": [],
       "examples": [
@@ -77,7 +77,7 @@
     "counterparty_provenance": {
       "label": "Counterparty provenance (who operates this endpoint)",
       "keywordMatches": 1,
-      "sellerCount": 0,
+      "listingCount": 0,
       "distinctProviders": 0,
       "floorPriceUsd": null,
       "freeOrZeroPriced": 0,
@@ -90,9 +90,9 @@
       "examples": []
     },
     "domain_registration": {
-      "label": "Domain registration (WHOIS) — adjacent, answers a different question",
+      "label": "Domain registration (WHOIS) \u2014 adjacent, answers a different question",
       "keywordMatches": 5,
-      "sellerCount": 5,
+      "listingCount": 5,
       "distinctProviders": 2,
       "floorPriceUsd": 0.022,
       "freeOrZeroPriced": 0,
@@ -128,7 +128,7 @@
     "security_posture": {
       "label": "Security posture of a host",
       "keywordMatches": 4,
-      "sellerCount": 4,
+      "listingCount": 4,
       "distinctProviders": 1,
       "floorPriceUsd": 0.0594,
       "freeOrZeroPriced": 0,
@@ -158,6 +158,6 @@
     }
   },
   "coverage": "endpoints surfaced by the listed queries; not a guaranteed full enumeration",
-  "note": "Category membership is keyword classification over listing descriptions, then manual review. It is a floor on how many sellers exist, not a census. Exclusions are listed per category with their reason rather than removed from the patterns.",
+  "note": "Category membership is keyword classification over listing descriptions, then manual review. Counts are LISTINGS, not sellers: distinctProviders is the seller count. It is a floor, not a census. Exclusions are listed per category with their reason rather than removed from the patterns.",
   "priceBasis": "PER_CALL uses the call price; PER_RESULT uses the per-result fee, not the flat fee. floorPriceUsd ignores zero-priced listings and counts them separately."
 }

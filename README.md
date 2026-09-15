@@ -166,6 +166,16 @@ The measured snapshot used three live Monid calls:
 repetitions are not equivalent to 200 Vendorapp AI pre-screens. Hosting and
 engineering are excluded.
 
+Compare per unit, not per month. At full utilisation the Startup plan is
+**$0.745** a pre-screen, so the measured chain is **3.1x cheaper**, not the
+625x that a monthly fee set beside a single call implies. Break-even is about
+**625 runs a month**, three times the allowance the plan sells. And below 15
+screens a month Vendorapp Basic is free while 15 chains cost **$3.58**, so on
+price alone we lose at the low end.
+
+That is the honest shape of the price argument, and it is why the extended
+round went after something other than price.
+
 Discovery queries used for the measured run:
 
 ```text

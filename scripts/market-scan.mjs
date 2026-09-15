@@ -70,7 +70,7 @@ for (const [key, spec] of Object.entries(CATEGORIES)) {
   categories[key] = {
     label: spec.label,
     keywordMatches: matched.length,
-    sellerCount: hits.length,
+    listingCount: hits.length,
     distinctProviders: new Set(hits.map(h => h.provider)).size,
     floorPriceUsd: priced.length ? Math.min(...priced.map(p => p.priceUsd)) : null,
     freeOrZeroPriced: hits.length - priced.length,
@@ -89,7 +89,7 @@ const snapshot = {
   costUsd: 0,
   categories,
   coverage: 'endpoints surfaced by the listed queries; not a guaranteed full enumeration',
-  note: 'Category membership is keyword classification over listing descriptions, then manual review. It is a floor on how many sellers exist, not a census. Exclusions are listed per category with their reason rather than removed from the patterns.',
+  note: 'Category membership is keyword classification over listing descriptions, then manual review. Counts are LISTINGS, not sellers: distinctProviders is the seller count. It is a floor, not a census. Exclusions are listed per category with their reason rather than removed from the patterns.',
   priceBasis: 'PER_CALL uses the call price; PER_RESULT uses the per-result fee, not the flat fee. floorPriceUsd ignores zero-priced listings and counts them separately.'
 };
 
@@ -99,5 +99,5 @@ const out = process.argv.includes('--out')
 writeFileSync(out, JSON.stringify(snapshot, null, 2) + '\n');
 console.log(`Wrote ${out}`);
 for (const [k, v] of Object.entries(categories)) {
-  console.log(`  ${String(v.sellerCount).padStart(3)} sellers  floor ${v.floorPriceUsd === null ? '—' : '$' + v.floorPriceUsd}  ${v.label}`);
+  console.log(`  ${String(v.listingCount).padStart(3)} listings  floor ${v.floorPriceUsd === null ? '—' : '$' + v.floorPriceUsd}  ${v.label}`);
 }
