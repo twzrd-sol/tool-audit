@@ -61,6 +61,7 @@ export const COHORT_LIMITATION =
   'Security-header evidence describes the HTTP response of one host at one moment. It is not a judgement of the vendor, its data quality, or its trustworthiness, and a passing grade is not an approval to spend.';
 
 interface CohortClient {
+  discover(query: string, limit?: number): Promise<MonidEndpoint[]>;
   inspect(toolId: string): Promise<MonidEndpoint | null>;
   run(
     toolId: string,
@@ -137,9 +138,24 @@ export async function runCohortScreen(
   const unitPriceUsd = endpoint.pricing.baseFeeUsd;
   if (!(unitPriceUsd >= 0)) throw new CohortBudgetError('Live inspect returned no usable USD unit price.');
 
-  const targets: CounterpartyTarget[] = options.limit
+  if (options.limit !== undefined && (!Number.isInteger(options.limit) || options.limit < 0)) {
+    throw new CohortBudgetError(
+      `Refused before spending: limit must be an integer >= 0, received ${options.limit}.`
+    );
+  }
+  const targets: CounterpartyTarget[] = options.limit !== undefined
     ? plan.targets.slice(0, options.limit)
     : plan.targets;
+
+  if (typeof client.discover !== "function") {
+    throw new CohortBudgetError("Refused before spending: cohort-screen requires live discover.");
+  }
+  const discovered = await client.discover("strale response header security check", 20);
+  if (!discovered.some(found => found.id === HEADER_CHECK_TOOL)) {
+    throw new CohortBudgetError(
+      `Refused before spending: ${HEADER_CHECK_TOOL} was not returned by live discover.`
+    );
+  }
 
   const worstCase = round(targets.length * unitPriceUsd);
   if (worstCase > options.maxTotalUsd) {

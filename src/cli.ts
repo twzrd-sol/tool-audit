@@ -136,6 +136,12 @@ async function main() {
       return;
     }
     const limitIndex = args.indexOf('--limit');
+    const limit = limitIndex >= 0 ? Number(args[limitIndex + 1]) : undefined;
+    if (limit !== undefined && (!Number.isInteger(limit) || limit < 0)) {
+      console.error(`🛑 Refused: --limit must be an integer >= 0, got '${args[limitIndex + 1]}'.`);
+      process.exitCode = 2;
+      return;
+    }
     const outIndex = args.indexOf('--out');
     const out = outIndex >= 0 ? args[outIndex + 1] : undefined;
 
@@ -153,7 +159,7 @@ async function main() {
     const report = await runCohortScreen(client, plan, {
       confirmSpend: true,
       maxTotalUsd,
-      ...(limitIndex >= 0 ? { limit: Number(args[limitIndex + 1]) } : {}),
+      ...(limit !== undefined ? { limit } : {}),
       onProgress: msg => console.error(`   ${msg}`)
     });
     const json = JSON.stringify(report, null, 2);

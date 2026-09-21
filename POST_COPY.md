@@ -22,9 +22,8 @@ Breakdown, if asked:
 | **Total** | | **$2.0808** |
 
 Provenance sweep, 409 endpoints surfaced and 62 providers inspected, cost
-**$0.00** — discovery and inspection settle nothing. Workspace balance $22.46
-before, $20.68 after; the $1.78 delta is the paid screen alone and matches the
-receipts exactly.
+**$0.00**. Discovery and inspection do not call `run`. The paid screen's
+receipts are the $1.7820 row above.
 
 ## X / LinkedIn post
 

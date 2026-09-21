@@ -19,8 +19,9 @@ first submission.
 
 The hackathon was then extended and $20 of Monid credit was granted, so a
 second measured run followed on 2026-09-15 at **$1.7820** — see the update
-below. **Total measured campaign spend: $2.0808.** Workspace
-balance $22.46 before, $20.68 after; receipts and balance agree.
+below. **Total measured campaign spend: $2.0808.** That total is the
+$0.2394 v1 subtotal, the $1.7820 counterparty screen, and a $0.0594
+re-screen.
 
 ## Update, 2026-09-15: who are you actually paying?
 
@@ -43,7 +44,7 @@ reproduce with `node scripts/selection-blindness.mjs`.
 
 Swept with discovery and inspection only — 25 seed queries surfaced **409
 endpoints across 62 providers**, and we inspected **one endpoint per provider,
-62 in all**, for **$0.00**. Workspace balance $22.46 before and $22.46 after:
+62 in all**, for **$0.00**. Discovery and inspection do not call `run`:
 
 | | Count | Share |
 | --- | ---: | ---: |
@@ -85,8 +86,9 @@ together.
 | Counterparty-deduplicated cost | **$1.8414** |
 
 Measured run: 31 targets, **30 screened**, 1 failed, **58 brands covered for
-$1.7820** against a $2.00 ceiling. `api.kadec0.xyz` answered HTTP 400, was
-billed $0.00, and is recorded failed — a non-2xx is not evidence.
+$1.7820** against a $2.00 ceiling. `kadec0.xyz` answered HTTP 400, was
+billed $0.00, and is recorded failed. The screen called `https://kadec0.xyz`,
+not the listing doc host `api.kadec0.xyz`. A non-2xx is not evidence.
 
 Security-header grades across those 30 documentation hosts:
 

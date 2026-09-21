@@ -32,6 +32,7 @@ function client(runs: Record<string, MonidRun | Error>, endpoint = priced(0.0594
   const calls: string[] = [];
   return {
     calls,
+    discover: async () => [endpoint],
     inspect: async () => endpoint,
     run: async (_t: string, input: Record<string, unknown>) => {
       const url = String((input.queryParams as Record<string, unknown>).url);
@@ -66,6 +67,27 @@ test('refuses a pricing model it cannot bound', async () => {
     () => runCohortScreen(client({}, priced(0.0594, 'per-result')), plan([]), { confirmSpend: true, maxTotalUsd: 2 }),
     /requires PER_CALL USD/
   );
+});
+
+test('refuses before spending when discover does not return the header check', async () => {
+  const c = client({});
+  c.discover = async () => [];
+  await assert.rejects(
+    () => runCohortScreen(c, plan([{ host: 'a.com', brands: ['A'] }]), { confirmSpend: true, maxTotalUsd: 2 }),
+    /not returned by live discover/
+  );
+  assert.equal(c.calls.length, 0);
+});
+
+test('limit 0 screens nothing', async () => {
+  const c = client({ 'https://a.com': ok('r1', 'A') });
+  const report = await runCohortScreen(c, plan([{ host: 'a.com', brands: ['A'] }]), {
+    confirmSpend: true,
+    maxTotalUsd: 2,
+    limit: 0
+  });
+  assert.equal(report.attempted, 0);
+  assert.equal(c.calls.length, 0);
 });
 
 test('the live inspected price overrides the planned price', async () => {

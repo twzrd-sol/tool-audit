@@ -33,22 +33,23 @@ export class ToolAuditor {
       penaltyScore += 50;
     }
 
-    // Check 1: Transport Security (HTTPS vs Plaintext HTTP)
-    if (this.policy.requireHttps && !tool.url.startsWith('https://')) {
+    // Transport and query-credential checks apply to the vendor URL when
+    // inspect returned one. The Monid /v1/run URL is not that vendor.
+    const transportUrl = tool.docUrl || tool.url;
+    if (this.policy.requireHttps && !transportUrl.startsWith('https://')) {
       findings.push({
         code: 'INSECURE_TRANSPORT',
         severity: 'CRITICAL',
         category: 'TRANSPORT_SECURITY',
         title: 'Non-HTTPS Endpoint',
-        description: `Endpoint ${tool.url} is not HTTPS, so transport confidentiality and integrity are not established.`,
+        description: `Endpoint ${transportUrl} is not HTTPS, so transport confidentiality and integrity are not established.`,
         recommendation: 'Refuse execution until the provider migrates to HTTPS (TLS 1.3 preferred).'
       });
       penaltyScore += 50;
     }
 
-    // Check 2: Credential & Auth Hygiene in URL/Query
     const sensitiveQueryParams = ['key', 'token', 'secret', 'auth', 'password', 'bearer', 'apikey', 'api_key'];
-    const urlLower = tool.url.toLowerCase();
+    const urlLower = transportUrl.toLowerCase();
     for (const param of sensitiveQueryParams) {
       if (
         this.policy.disallowQueryAuth &&

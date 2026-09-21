@@ -295,7 +295,7 @@
     <div class="card"><pre style="margin:0;overflow-x:auto"><code>npm ci &amp;&amp; npm run build
 node dist/cli.js catalog-provenance --out evidence/catalog-provenance.json   # free
 node dist/cli.js cohort-screen --confirm-spend --max-total 2                 # paid</code></pre></div>
-    <p class="muted" style="font-size:14px">The first command settles nothing; we read the workspace balance either side and it did not move. The second is the only one that spends, and it refuses before the first call if the live inspected price would breach the ceiling.</p>
+    <p class="muted" style="font-size:14px">The first command settles nothing: discovery and inspection do not call run. The second is the only one that spends, and it refuses before the first call if the live inspected price would breach the ceiling.</p>
 
     <footer>
       <p>Built for Monid's 2026 “We Kill” hackathon. Figures on this page are generated from <code>evidence/</code> at build time, not typed in.</p>
