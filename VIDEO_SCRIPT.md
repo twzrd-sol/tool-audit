@@ -6,7 +6,7 @@ Final export:
 - Format: H.264 + silent AAC in MP4
 - Resolution: **1920×1080**
 - Captions: burned into the storyboard
-- File: `/home/twzrd/tool-audit-submission.mp4` (kept outside Git)
+- File: `tool-audit-submission.mp4` (kept outside Git)
 - Release: https://github.com/twzrd-sol/tool-audit/releases/tag/hackathon-submission-1080p
 - Storyboard: `pages/film.html`
 - Matching main SHA: `fce4308b9216cf5e791f180fa094779d9e594a01` (2026-09-11 02:42:11 UTC / 2026-09-10 21:42 ET)
